@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 import os
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -81,28 +83,32 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.1/ref/settings/#databases
+# Database: MySQL is required for this project.
+# Set MYSQL_DATABASE, MYSQL_USER, and MYSQL_PASSWORD in the environment.
+mysql_config = {
+    'MYSQL_DATABASE': os.environ.get('MYSQL_DATABASE'),
+    'MYSQL_USER': os.environ.get('MYSQL_USER'),
+    'MYSQL_PASSWORD': os.environ.get('MYSQL_PASSWORD'),
+}
+missing_mysql_settings = [name for name, value in mysql_config.items() if value is None]
 
-if os.environ.get('MYSQL_DATABASE'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ['MYSQL_DATABASE'],
-            'USER': os.environ.get('MYSQL_USER', ''),
-            'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
-            'HOST': os.environ.get('MYSQL_HOST', '127.0.0.1'),
-            'PORT': os.environ.get('MYSQL_PORT', '3306'),
-            'OPTIONS': {'charset': 'utf8mb4'},
-        }
+if missing_mysql_settings:
+    raise ImproperlyConfigured(
+        'Set these MySQL environment variables before starting GromBricks: '
+        + ', '.join(missing_mysql_settings)
+    )
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': mysql_config['MYSQL_DATABASE'],
+        'USER': mysql_config['MYSQL_USER'],
+        'PASSWORD': mysql_config['MYSQL_PASSWORD'],
+        'HOST': os.environ.get('MYSQL_HOST', '127.0.0.1'),
+        'PORT': os.environ.get('MYSQL_PORT', '3306'),
+        'OPTIONS': {'charset': 'utf8mb4'},
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 
 # Password validation

@@ -18,6 +18,10 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    class ProductType(models.TextChoices):
+        MINIFIGURE = 'minifigure', 'Мініфігурка'
+        PART = 'part', 'Деталь'
+
     class Condition(models.TextChoices):
         NEW = 'new', 'Новий'
         USED = 'used', 'Вживаний'
@@ -27,6 +31,9 @@ class Product(models.Model):
         on_delete=models.PROTECT,
         related_name='products',
         verbose_name='категорія',
+    )
+    product_type = models.CharField(
+        'тип товару', max_length=12, choices=ProductType.choices
     )
     sku = models.CharField('артикул', max_length=50, unique=True)
     name = models.CharField('назва', max_length=200)
@@ -41,6 +48,7 @@ class Product(models.Model):
     )
     stock_quantity = models.PositiveIntegerField('кількість на складі', default=0)
     image = models.ImageField('зображення', upload_to='products/%Y/%m/', blank=True)
+    is_rare = models.BooleanField('рідкісний товар', default=False)
     is_active = models.BooleanField('показувати в каталозі', default=True)
     created_at = models.DateTimeField('створено', auto_now_add=True)
     updated_at = models.DateTimeField('оновлено', auto_now=True)

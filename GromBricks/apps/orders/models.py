@@ -16,8 +16,12 @@ class Order(models.Model):
         CANCELLED = 'cancelled', 'Скасовано'
 
     class PaymentMethod(models.TextChoices):
-        CASH_ON_DELIVERY = 'cash_on_delivery', 'Оплата при отриманні'
-        BANK_TRANSFER = 'bank_transfer', 'Банківський переказ вручну'
+        BANK_TRANSFER = 'bank_transfer', 'Переказ на картку / рахунок'
+
+    class DeliveryService(models.TextChoices):
+        UKRPOSHTA = 'ukrposhta', 'Укрпошта'
+        NOVA_POSHTA = 'nova_poshta', 'Нова пошта'
+        MEEST = 'meest', 'Meest Пошта'
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -29,8 +33,11 @@ class Order(models.Model):
     recipient_name = models.CharField('отримувач', max_length=150)
     phone = models.CharField('телефон', max_length=30)
     city = models.CharField('місто', max_length=100)
-    address = models.CharField('адреса доставки', max_length=255)
+    address = models.CharField('адреса / відділення доставки', max_length=255)
     postal_code = models.CharField('поштовий індекс', max_length=20, blank=True)
+    delivery_service = models.CharField(
+        'служба доставки', max_length=12, choices=DeliveryService.choices
+    )
     payment_method = models.CharField(
         'спосіб оплати', max_length=20, choices=PaymentMethod.choices
     )
