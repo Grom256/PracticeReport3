@@ -4,12 +4,12 @@
 
 ## Локальний запуск
 
-Потрібні Python, MySQL Server 8.4 або новіший і база даних `grombricks` з кодуванням `utf8mb4`. Django 6.1 підтримує MySQL від 8.4. Структуру таблиць створюють Django migrations; вручну створювати таблиці в MySQL Workbench не потрібно.
+Потрібні Python, MySQL Server 8.4 або новіший і база даних `grombrick` з кодуванням `utf8mb4`. Django 6.1 підтримує MySQL від 8.4. Структуру таблиць створюють Django migrations; вручну створювати таблиці в MySQL Workbench не потрібно.
 
 У MySQL Workbench створіть базу даних:
 
 ```sql
-CREATE DATABASE grombricks CHARACTER SET utf8mb4;
+CREATE DATABASE grombrick CHARACTER SET utf8mb4;
 ```
 
 Для застосунку рекомендовано створити окремого користувача MySQL з правами лише на цю базу.
@@ -17,7 +17,7 @@ CREATE DATABASE grombricks CHARACTER SET utf8mb4;
 У PowerShell з кореня репозиторію задайте параметри підключення. Пароль не додавайте до Git:
 
 ```powershell
-$env:MYSQL_DATABASE = 'grombricks'
+$env:MYSQL_DATABASE = 'grombrick'
 $env:MYSQL_USER = 'grombricks_app'
 $env:MYSQL_PASSWORD = 'ваш_локальний_пароль'
 $env:MYSQL_HOST = '127.0.0.1'
