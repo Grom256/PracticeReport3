@@ -31,13 +31,20 @@
                 <a href="{% url 'catalog:product_list' %}?rare=1">Рідкісне</a>
                 <a href="{% url 'catalog:home' %}#about">Про магазин</a>
             </nav>
-            <span class="header-cart" aria-label="Кошик буде доступний у наступному етапі">
-                <span class="cart-icon" aria-hidden="true">＋</span> Кошик <span class="cart-count">0</span>
-            </span>
+            <div class="header-actions">
+                {% if user.is_authenticated %}
+                    <a class="header-account" href="{% url 'accounts:profile' %}">Профіль</a>
+                    <form class="header-logout" method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Вийти</button></form>
+                {% else %}
+                    <a class="header-account" href="{% url 'accounts:login' %}">Увійти</a>
+                    <a class="header-account header-register" href="{% url 'accounts:register' %}">Реєстрація</a>
+                {% endif %}
+                <a class="header-cart" href="{% url 'cart:detail' %}"><span class="cart-icon" aria-hidden="true">＋</span> Кошик <span class="cart-count">{{ cart_count }}</span></a>
+            </div>
         </div>
     </header>
     <main id="main-content">
-        {% if messages %}<div class="page-width message-list" aria-live="polite">{% for message in messages %}<p class="message">{{ message }}</p>{% endfor %}</div>{% endif %}
+        {% if messages %}<div class="page-width message-list" aria-live="polite">{% for message in messages %}<p class="message{% if 'error' in message.tags %} message-error{% endif %}">{{ message }}</p>{% endfor %}</div>{% endif %}
         {% block content %}{% endblock %}
     </main>
     <footer class="site-footer" id="contact">

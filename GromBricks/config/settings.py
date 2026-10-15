@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.cart.context_processors.cart_summary',
             ],
         },
     },
@@ -90,6 +91,10 @@ mysql_config = {
     'MYSQL_USER': os.environ.get('MYSQL_USER'),
     'MYSQL_PASSWORD': os.environ.get('MYSQL_PASSWORD'),
 }
+
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'accounts:profile'
+LOGOUT_REDIRECT_URL = 'catalog:home'
 missing_mysql_settings = [name for name, value in mysql_config.items() if value is None]
 
 if missing_mysql_settings:
