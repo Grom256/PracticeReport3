@@ -69,6 +69,11 @@ class Cart:
         self.items.pop(str(product_id), None)
         self._save()
 
+    def clear(self):
+        self.session.pop(self.session_key, None)
+        self.items = {}
+        self.session.modified = True
+
     def _save(self):
         self.session[self.session_key] = self.items
         self.session.modified = True
