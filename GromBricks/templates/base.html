@@ -34,7 +34,6 @@
             <div class="header-actions">
                 {% if user.is_authenticated %}
                     <a class="header-account" href="{% url 'accounts:profile' %}">Профіль</a>
-                    <a class="header-account header-orders" href="{% url 'orders:list' %}">Замовлення</a>
                     <form class="header-logout" method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Вийти</button></form>
                 {% else %}
                     <a class="header-account" href="{% url 'accounts:login' %}">Увійти</a>
