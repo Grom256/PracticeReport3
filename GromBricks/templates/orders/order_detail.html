@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Замовлення №{{ order.pk }} — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width order-detail-page">
+    <nav class="breadcrumbs" aria-label="Навігаційний шлях"><a href="{% url 'catalog:home' %}">Головна</a><span>/</span><a href="{% url 'orders:list' %}">Мої замовлення</a><span>/</span><span>№{{ order.pk }}</span></nav>
+    <div class="order-detail-heading"><div><p class="eyebrow">GromBricks / Замовлення</p><h1>Замовлення <span>№{{ order.pk }}</span></h1><p class="order-date">Створено {{ order.created_at|date:'d.m.Y о H:i' }}</p></div><span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span></div>
+    <div class="order-detail-layout">
+        <div class="checkout-panel">
+            <h2>Склад замовлення</h2>
+            <div class="order-items-list">
+                {% for item in order.items.all %}<div class="order-item-row"><a href="{% url 'catalog:product_detail' item.product_id %}">{{ item.product.name }}</a><span>{{ item.quantity }} × {{ item.unit_price|floatformat:2 }} ₴</span><strong>{{ item.line_total|floatformat:2 }} ₴</strong></div>{% endfor %}
+            </div>
+            <div class="checkout-total"><span>Разом за товари</span><strong>{{ order.total_amount|floatformat:2 }} ₴</strong></div>
+        </div>
+        <aside class="order-info-panel">
+            <h2>Доставка й оплата</h2>
+            <dl class="order-info-list"><div><dt>Одержувач</dt><dd>{{ order.recipient_name }}</dd></div><div><dt>Телефон</dt><dd>{{ order.phone }}</dd></div><div><dt>Місто</dt><dd>{{ order.city }}</dd></div><div><dt>Адреса / відділення</dt><dd>{{ order.address }}{% if order.postal_code %}, {{ order.postal_code }}{% endif %}</dd></div><div><dt>Перевізник</dt><dd>{{ order.get_delivery_service_display }}</dd></div><div><dt>Оплата</dt><dd>{{ order.get_payment_method_display }}</dd></div></dl>
+            {% if order.status == 'pending' or order.status == 'processing' %}<div class="payment-note"><strong>Оплата переказом</strong><p>Сайт не проводить платіж автоматично. Реквізити магазину ще не налаштовані; повні дані банківських карток на сайті не збираються.</p></div>{% endif %}
+        </aside>
+    </div>
+    <a class="text-link order-back-link" href="{% url 'orders:list' %}">← До історії замовлень</a>
+</section>
+{% endblock %}

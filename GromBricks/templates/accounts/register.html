@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Реєстрація — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width form-page">
+    <div class="form-panel">
+        <p class="eyebrow">GromBricks / Обліковий запис</p>
+        <h1>Створити <span>акаунт</span></h1>
+        <p class="form-intro">Зареєструйся, щоб зберігати кошик і оформлювати замовлення.</p>
+        <form method="post" class="site-form">
+            {% csrf_token %}
+            {% include 'accounts/partials/form_fields.html' %}
+            <button class="button button-gold" type="submit">Зареєструватися</button>
+        </form>
+        <p class="form-footnote">Вже маєш акаунт? <a href="{% url 'accounts:login' %}">Увійти</a></p>
+    </div>
+</section>
+{% endblock %}

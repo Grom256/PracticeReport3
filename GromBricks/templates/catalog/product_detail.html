@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width detail-page">
+    <nav class="breadcrumbs" aria-label="Навігаційний шлях"><a href="{% url 'catalog:home' %}">Головна</a><span>/</span><a href="{% url 'catalog:product_list' %}">Каталог</a><span>/</span><span>{{ product.name }}</span></nav>
+    <div class="detail-layout">
+        <div class="detail-image-wrap">
+            {% if product.image %}<img class="detail-image" src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}<div class="detail-image product-placeholder" aria-label="Фото товару ще не додано"><span class="placeholder-stud"></span><span class="placeholder-label">Фото<br>товару</span></div>{% endif %}
+            {% if product.is_rare %}<span class="product-badge">Рідкісне</span>{% endif %}
+        </div>
+        <div class="detail-copy">
+            <p class="eyebrow">{{ product.get_product_type_display }} · {{ product.category.name }}</p><h1>{{ product.name }}</h1><p class="detail-sku">Артикул: {{ product.sku }}</p>
+            <p class="detail-price">{{ product.price|floatformat:2 }} <span>₴</span></p>
+            <p class="detail-stock {% if not product.stock_quantity %}stock-none{% endif %}">{% if product.stock_quantity %}Є в наявності: {{ product.stock_quantity }} шт.{% else %}Тимчасово немає в наявності{% endif %}</p>
+            <div class="detail-description">{% if product.description %}{{ product.description|linebreaks }}{% else %}<p>Опис цього товару ще не додано.</p>{% endif %}</div>
+            <dl class="product-specs">{% if product.series %}<div><dt>Серія / тематика</dt><dd>{{ product.series }}</dd></div>{% endif %}{% if product.color %}<div><dt>Колір</dt><dd>{{ product.color }}</dd></div>{% endif %}<div><dt>Стан</dt><dd>{{ product.get_condition_display }}</dd></div><div><dt>Артикул</dt><dd>{{ product.sku }}</dd></div></dl>
+            {% if product.stock_quantity %}
+                {% if user.is_authenticated %}
+                    <form class="add-to-cart-form" method="post" action="{% url 'cart:add' product.id %}">{% csrf_token %}<label for="id_quantity">Кількість</label><input id="id_quantity" type="number" name="quantity" min="1" max="{{ product.stock_quantity }}" value="1" required><button class="button button-gold" type="submit">Додати до кошика</button></form>
+                {% else %}
+                    <p class="detail-note"><a href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Увійди, щоб додати товар до кошика.</a></p>
+                {% endif %}
+            {% endif %}
+            <a class="button button-outline" href="{% url 'catalog:product_list' %}">← Повернутися до каталогу</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

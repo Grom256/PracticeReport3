@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Мій профіль — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width form-page">
+    <div class="form-panel">
+        <p class="eyebrow">GromBricks / Особистий кабінет</p>
+        <h1>Мій <span>профіль</span></h1>
+        <p class="form-intro">Логін: <strong>{{ request.user.username }}</strong></p>
+        <form method="post" class="site-form">
+            {% csrf_token %}
+            {% include 'accounts/partials/form_fields.html' %}
+            <button class="button button-gold" type="submit">Зберегти зміни</button>
+        </form>
+        <a class="text-link profile-orders-link" href="{% url 'cart:detail' %}">Перейти до кошика <span aria-hidden="true">↗</span></a>
+        <a class="text-link profile-orders-link" href="{% url 'orders:list' %}">Історія замовлень <span aria-hidden="true">↗</span></a>
+    </div>
+</section>
+{% endblock %}

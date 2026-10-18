@@ -4,27 +4,19 @@
 
 ## Локальний запуск
 
-Потрібні Python, MySQL Server 8.4 або новіший і база даних `grombrick` з кодуванням `utf8mb4`. Django 6.1 підтримує MySQL від 8.4. Структуру таблиць створюють Django migrations; вручну створювати таблиці в MySQL Workbench не потрібно.
-
-У MySQL Workbench створіть базу даних:
+Потрібні Python і MySQL Server 8.4. Структуру таблиць створюють Django migrations. MySQL-схему `grombrick` можна створити скриптом `database/create_schema.sql` або командою в MySQL:
 
 ```sql
 CREATE DATABASE grombrick CHARACTER SET utf8mb4;
 ```
 
-Для застосунку рекомендовано створити окремого користувача MySQL з правами лише на цю базу.
-
-У PowerShell з кореня репозиторію задайте параметри підключення. Пароль не додавайте до Git:
+З кореня репозиторію скопіюйте приклад налаштувань і заповніть `.env` своїми параметрами MySQL. Не додавайте `.env` до Git:
 
 ```powershell
-$env:MYSQL_DATABASE = 'grombrick'
-$env:MYSQL_USER = 'grombricks_app'
-$env:MYSQL_PASSWORD = 'ваш_локальний_пароль'
-$env:MYSQL_HOST = '127.0.0.1'
-$env:MYSQL_PORT = '3306'
+Copy-Item GromBricks\.env.example GromBricks\.env
 ```
 
-Потім перейдіть до папки проєкту й виконайте:
+Потім виконайте:
 
 ```powershell
 cd GromBricks
@@ -34,7 +26,7 @@ cd GromBricks
 ..\.venv\Scripts\python.exe manage.py runserver
 ```
 
-Для наступних сеансів PowerShell змінні середовища потрібно задати знову або налаштувати постійно у Windows. Django Admin відкривається за адресою `/admin/`.
+Django Admin відкривається за адресою `/admin/`. Назви змінних оточення наведені в `.env.example`; секретні значення зберігай лише у локальному `.env`.
 
 ## Структура даних
 

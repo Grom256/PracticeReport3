@@ -13,23 +13,26 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 import os
 
+from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-development-key-change-before-deployment',
-)
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() == 'true'
+
+# Keep production secrets out of source control; this fallback is local-only.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('Set DJANGO_SECRET_KEY in the environment.')
+    SECRET_KEY = 'django-insecure-local-development-key-change-before-deployment'
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -84,22 +87,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database: MySQL is required for this project.
-# Set MYSQL_DATABASE, MYSQL_USER, and MYSQL_PASSWORD in the environment.
-mysql_config = {
-    'MYSQL_DATABASE': os.environ.get('MYSQL_DATABASE'),
-    'MYSQL_USER': os.environ.get('MYSQL_USER'),
-    'MYSQL_PASSWORD': os.environ.get('MYSQL_PASSWORD'),
-}
-
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'accounts:profile'
 LOGOUT_REDIRECT_URL = 'catalog:home'
-missing_mysql_settings = [name for name, value in mysql_config.items() if value is None]
 
+mysql_config = {
+    'MYSQL_DATABASE': os.environ.get('MYSQL_DATABASE') or None,
+    'MYSQL_USER': os.environ.get('MYSQL_USER') or None,
+    'MYSQL_PASSWORD': os.environ.get('MYSQL_PASSWORD') or None,
+}
+missing_mysql_settings = [name for name, value in mysql_config.items() if value is None]
 if missing_mysql_settings:
     raise ImproperlyConfigured(
-        'Set these MySQL environment variables before starting GromBricks: '
+        'Set these MySQL environment variables in .env: '
         + ', '.join(missing_mysql_settings)
     )
 
@@ -109,8 +109,8 @@ DATABASES = {
         'NAME': mysql_config['MYSQL_DATABASE'],
         'USER': mysql_config['MYSQL_USER'],
         'PASSWORD': mysql_config['MYSQL_PASSWORD'],
-        'HOST': os.environ.get('MYSQL_HOST', '127.0.0.1'),
-        'PORT': os.environ.get('MYSQL_PORT', '3306'),
+        'HOST': os.environ.get('MYSQL_HOST') or '127.0.0.1',
+        'PORT': os.environ.get('MYSQL_PORT') or '3306',
         'OPTIONS': {'charset': 'utf8mb4'},
     }
 }

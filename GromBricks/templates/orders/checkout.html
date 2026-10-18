@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Оформлення замовлення — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width checkout-page">
+    <div class="page-intro"><p class="eyebrow">GromBricks / Оформлення</p><h1>Дані <span>доставки</span></h1><p>Перевір склад кошика й залиш контактні дані одержувача.</p></div>
+    <div class="checkout-layout">
+        <div class="checkout-panel">
+            <h2>Одержувач і доставка</h2>
+            <form method="post" class="site-form checkout-form">
+                {% csrf_token %}
+                {% include 'accounts/partials/form_fields.html' %}
+                <div class="payment-note"><strong>Переказ на картку / рахунок</strong><p>Це навчальний сценарій: сайт не проводить банківські платежі й не запитує реквізити твоєї картки. Реквізити магазину ще не налаштовані.</p></div>
+                <button class="button button-gold" type="submit">Підтвердити замовлення</button>
+            </form>
+        </div>
+        <aside class="checkout-summary" aria-label="Підсумок кошика">
+            <h2>Твоє замовлення</h2>
+            <ul class="checkout-items">
+                {% for item in cart_items %}<li><span>{{ item.product.name }} <small>× {{ item.quantity }}</small></span><strong>{{ item.line_total|floatformat:2 }} ₴</strong></li>{% endfor %}
+            </ul>
+            <div class="checkout-total"><span>Разом за товари</span><strong>{{ total|floatformat:2 }} ₴</strong></div>
+            <p>Вартість доставки не включена в суму товарів.</p>
+        </aside>
+    </div>
+</section>
+{% endblock %}

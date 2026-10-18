@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Мої замовлення — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width orders-page">
+    <div class="page-intro"><p class="eyebrow">GromBricks / Особистий кабінет</p><h1>Мої <span>замовлення</span></h1><p>Переглядай склад і поточний статус своїх покупок.</p></div>
+    {% if orders %}
+        <div class="orders-list">
+            {% for order in orders %}
+                <a class="order-card" href="{% url 'orders:detail' order.pk %}">
+                    <span class="order-number">Замовлення №{{ order.pk }}<small>{{ order.created_at|date:'d.m.Y H:i' }}</small></span>
+                    <span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span>
+                    <span class="order-card-total">{{ order.calculated_total|floatformat:2 }} ₴</span>
+                    <span class="order-card-arrow" aria-hidden="true">↗</span>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state"><span class="empty-mark">✦</span><h2>Замовлень поки немає</h2><p>Твої оформлені замовлення з’являться тут.</p><a class="button button-gold" href="{% url 'catalog:product_list' %}">Переглянути каталог</a></div>
+    {% endif %}
+</section>
+{% endblock %}

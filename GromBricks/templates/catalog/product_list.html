@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Каталог LEGO — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width catalog-page">
+    <div class="page-intro"><p class="eyebrow">GromBricks / Каталог</p><h1>Знайди свою <span>знахідку</span></h1><p>Мініфігурки та окремі деталі для колекції й власних збірок.</p></div>
+    <form class="catalog-filters" method="get">
+        <label class="search-field"><span class="sr-only">Пошук товарів</span><input type="search" name="q" value="{{ query }}" placeholder="Пошук за назвою, серією чи артикулом"></label>
+        <label><span class="sr-only">Тип товару</span><select name="type"><option value="">Усі типи</option>{% for value, label in product_types %}<option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+        <label><span class="sr-only">Тематична категорія</span><select name="category"><option value="">Усі тематики</option>{% for category in categories %}<option value="{{ category.slug }}" {% if selected_category == category.slug %}selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></label>
+        <label><span class="sr-only">Сортування</span><select name="sort"><option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Спочатку нові</option><option value="name" {% if selected_sort == 'name' %}selected{% endif %}>За назвою</option><option value="price_asc" {% if selected_sort == 'price_asc' %}selected{% endif %}>Ціна: від дешевших</option><option value="price_desc" {% if selected_sort == 'price_desc' %}selected{% endif %}>Ціна: від дорожчих</option></select></label>
+        <label class="check-filter"><input type="checkbox" name="in_stock" value="1" {% if in_stock %}checked{% endif %}> Є в наявності</label>
+        <label class="check-filter"><input type="checkbox" name="rare" value="1" {% if rare_only %}checked{% endif %}> Рідкісне</label>
+        <button class="button button-gold filter-submit" type="submit">Застосувати</button><a class="filter-reset" href="{% url 'catalog:product_list' %}">Скинути фільтри</a>
+    </form>
+    <div class="catalog-result-line"><span>Знайдено: {{ page_obj.paginator.count }}</span><span>Ціни вказані у гривнях</span></div>
+    {% if page_obj.object_list %}
+        <div class="product-grid">{% for product in page_obj.object_list %}{% include 'catalog/partials/product_card.html' %}{% endfor %}</div>
+        {% if page_obj.has_other_pages %}<nav class="pagination" aria-label="Сторінки каталогу">
+            {% if page_obj.has_previous %}<a href="?{% if query %}q={{ query|urlencode }}&{% endif %}type={{ selected_type }}&category={{ selected_category|urlencode }}&sort={{ selected_sort }}{% if in_stock %}&in_stock=1{% endif %}{% if rare_only %}&rare=1{% endif %}&page={{ page_obj.previous_page_number }}" aria-label="Попередня сторінка">←</a>{% endif %}
+            <span>Сторінка {{ page_obj.number }} з {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}<a href="?{% if query %}q={{ query|urlencode }}&{% endif %}type={{ selected_type }}&category={{ selected_category|urlencode }}&sort={{ selected_sort }}{% if in_stock %}&in_stock=1{% endif %}{% if rare_only %}&rare=1{% endif %}&page={{ page_obj.next_page_number }}" aria-label="Наступна сторінка">→</a>{% endif %}
+        </nav>{% endif %}
+    {% else %}<div class="empty-state"><span class="empty-mark">⌕</span><h2>Нічого не знайшлося</h2><p>Спробуйте змінити пошуковий запит або скинути фільтри.</p><a class="button button-outline" href="{% url 'catalog:product_list' %}">Показати весь каталог</a></div>{% endif %}
+</section>
+{% endblock %}
