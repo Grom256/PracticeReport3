@@ -92,3 +92,7 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'{self.product} × {self.quantity}'
+
+    @property
+    def line_total(self):
+        return self.quantity * self.unit_price
