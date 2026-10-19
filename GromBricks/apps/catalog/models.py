@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.urls import reverse
 
 
 class Category(models.Model):
@@ -32,6 +34,14 @@ class Product(models.Model):
         related_name='products',
         verbose_name='категорія',
     )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='products',
+        verbose_name='власник запису',
+    )
     product_type = models.CharField(
         'тип товару', max_length=12, choices=ProductType.choices
     )
@@ -63,3 +73,6 @@ class Product(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.sku})'
+
+    def get_absolute_url(self):
+        return reverse('catalog:product_detail', kwargs={'pk': self.pk})

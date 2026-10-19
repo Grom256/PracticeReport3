@@ -191,7 +191,8 @@ h1, h2, h3, p { margin-top: 0; }
 .site-form { display: grid; gap: 16px; margin-top: 26px; }
 .form-field { display: grid; gap: 7px; }
 .form-field label { color: #c4ccda; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-.form-field input { width: 100%; min-height: 46px; padding: 10px 13px; border: 1px solid #293852; outline: none; background: #0b1423; color: var(--text); }
+.form-field input, .form-field select, .form-field textarea { width: 100%; min-height: 46px; padding: 10px 13px; border: 1px solid #293852; outline: none; background: #0b1423; color: var(--text); }
+.form-field input[type="checkbox"] { width: auto; min-height: auto; accent-color: var(--gold); }
 .form-field input:focus, .cart-quantity-form input:focus, .add-to-cart-form input:focus { border-color: var(--gold); }
 .form-field small { color: #8290a7; font-size: 11px; line-height: 1.6; }
 .form-field small ul { margin: 6px 0 0; padding-left: 18px; }
