@@ -17,13 +17,13 @@
 
 <section class="trust-strip" aria-label="Переваги магазину"><div class="page-width trust-items"><span><i>✦</i> Оригінальний LEGO</span><span><i>◈</i> Чесний опис стану</span><span><i>↗</i> Відправка по Україні</span><span><i>✧</i> Рідкісні знахідки</span></div></section>
 
-<section class="content-section page-width" id="catalog-directions">
+<section class="content-section page-width catalog-directions" id="catalog-directions">
     <div class="section-heading"><div><p class="eyebrow">Каталог</p><h2>Оберіть напрям</h2></div><a class="text-link" href="{% url 'catalog:product_list' %}">Усі позиції <span aria-hidden="true">↗</span></a></div>
     <div class="category-grid">
-        <a class="category-card category-card-figure" href="{% url 'catalog:product_list' %}?type=minifigure"><span class="category-number">01 / Колекція</span><span class="category-symbol" aria-hidden="true">◉</span><span class="category-title">Мініфігурки</span><span class="category-action">Дивитись <b>→</b></span></a>
-        <a class="category-card category-card-parts" href="{% url 'catalog:product_list' %}?type=part"><span class="category-number">02 / Деталі</span><span class="category-symbol" aria-hidden="true">▦</span><span class="category-title">Окремі деталі</span><span class="category-action">Дивитись <b>→</b></span></a>
-        <a class="category-card category-card-rare" href="{% url 'catalog:product_list' %}?rare=1"><span class="category-number">03 / Особлива добірка</span><span class="category-symbol" aria-hidden="true">✦</span><span class="category-title">Рідкісне</span><span class="category-action">Дивитись <b>→</b></span></a>
-        {% for category in categories %}<a class="category-card category-card-theme" href="{% url 'catalog:product_list' %}?category={{ category.slug|urlencode }}"><span class="category-number">Тематична добірка</span><span class="category-symbol" aria-hidden="true">◇</span><span class="category-title">{{ category.name }}</span><span class="category-action">Дивитись <b>→</b></span></a>{% endfor %}
+        <a class="category-card category-card-figure" href="{% url 'catalog:product_list' %}?type=minifigure"><span class="category-number">01 / Колекція</span><span class="category-content"><span class="category-title">Мініфігурки</span><span class="category-action">Дивитись <b>→</b></span></span></a>
+        <a class="category-card category-card-parts" href="{% url 'catalog:product_list' %}?type=part"><span class="category-number">02 / Деталі</span><span class="category-content"><span class="category-title">Окремі деталі</span><span class="category-action">Дивитись <b>→</b></span></span></a>
+        <a class="category-card category-card-rare" href="{% url 'catalog:product_list' %}?rare=1"><span class="category-number">03 / Особлива добірка</span><span class="category-content"><span class="category-title">Рідкісне</span><span class="category-action">Дивитись <b>→</b></span></span></a>
+        {% for category in categories %}<a class="category-card category-card-theme" href="{% url 'catalog:product_list' %}?category={{ category.slug|urlencode }}"><span class="category-number">Тематична добірка</span><span class="category-content"><span class="category-title">{{ category.name }}</span><span class="category-action">Дивитись <b>→</b></span></span></a>{% endfor %}
     </div>
 </section>
 

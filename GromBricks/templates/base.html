@@ -53,11 +53,11 @@
                 <a class="brand" href="{% url 'catalog:home' %}"><span class="brand-mark" aria-hidden="true">G</span><span class="brand-word">GROM<span>BRICKS</span></span></a>
                 <p>Фігурки та деталі LEGO для колекціонерів і майстрів.</p>
             </div>
-            <div><h2 class="footer-heading">Магазин</h2><a href="{% url 'catalog:product_list' %}">Каталог</a><a href="{% url 'catalog:product_list' %}?type=minifigure">Мініфігурки</a><a href="{% url 'catalog:product_list' %}?type=part">Деталі</a></div>
-            <div><h2 class="footer-heading">Інформація</h2><a href="{% url 'catalog:home' %}#delivery">Доставка й оплата</a><a href="{% url 'catalog:home' %}#about">Про магазин</a></div>
-            <div class="footer-contact"><h2 class="footer-heading">Зв’язок</h2><span>Посилання на канал додамо пізніше</span></div>
+            <div class="footer-column"><h2 class="footer-heading">Магазин</h2><a href="{% url 'catalog:product_list' %}">Усі товари</a><a href="{% url 'catalog:product_list' %}?type=minifigure">Мініфігурки</a><a href="{% url 'catalog:product_list' %}?type=part">Деталі</a><a href="{% url 'catalog:product_list' %}?rare=1">Рідкісне</a></div>
+            <div class="footer-column"><h2 class="footer-heading">Інформація</h2><a href="{% url 'catalog:home' %}#delivery">Доставка й оплата</a><a href="{% url 'catalog:home' %}#about">Про магазин</a><span>Магазин не пов’язаний з LEGO Group.</span></div>
+            <div class="footer-column"><h2 class="footer-heading">Покупки</h2><a href="{% url 'cart:detail' %}">Кошик</a>{% if user.is_authenticated %}<a href="{% url 'orders:list' %}">Мої замовлення</a><a href="{% url 'accounts:profile' %}">Особистий кабінет</a>{% else %}<a href="{% url 'accounts:login' %}">Увійти</a><a href="{% url 'accounts:register' %}">Створити акаунт</a>{% endif %}</div>
         </div>
-        <div class="page-width footer-bottom"><span>© GromBricks</span><span>Магазин не пов’язаний з LEGO Group.</span></div>
+        <div class="page-width footer-bottom"><span>© GromBricks</span><span>Фігурки та деталі LEGO для колекції й власних збірок.</span></div>
     </footer>
     <script src="{% static 'js/site.js' %}" defer></script>
 </body>
