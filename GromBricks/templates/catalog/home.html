@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}GromBricks — фігурки та деталі LEGO{% endblock %}
+{% block body_class %}page-home{% endblock %}
 {% block content %}
 <section class="hero-section">
     <img class="hero-background" src="{% static 'images/hero-bg.webp' %}" alt="" aria-hidden="true">
@@ -10,12 +11,10 @@
             <h1>Фігурки<br><span>з характером</span></h1>
             <p class="hero-description">Фігурки та деталі LEGO для колекціонерів і майстрів. Ретельно відібрані позиції, які варто мати.</p>
             <div class="hero-actions"><a class="button button-gold" href="{% url 'catalog:product_list' %}">До каталогу <span aria-hidden="true">↗</span></a><a class="button button-outline" href="#latest">Нові надходження</a></div>
-            <p class="hero-note"><span class="gold-dot"></span> Оригінальний LEGO · Чесний опис стану</p>
         </div>
     </div>
 </section>
-
-<section class="trust-strip" aria-label="Переваги магазину"><div class="page-width trust-items"><span><i>✦</i> Оригінальний LEGO</span><span><i>◈</i> Чесний опис стану</span><span><i>↗</i> Відправка по Україні</span><span><i>✧</i> Рідкісні знахідки</span></div></section>
+<div class="hero-trust" aria-label="Переваги магазину"><div class="page-width trust-items"><span><i>✦</i> Оригінальний LEGO</span><span><i>◈</i> Чесний опис стану</span><span><i>↗</i> Відправка по Україні</span><span><i>✧</i> Рідкісні знахідки</span></div></div>
 
 <section class="content-section catalog-directions" id="catalog-directions"><div class="page-width catalog-directions-inner">
     <div class="section-heading"><div><p class="eyebrow">Каталог</p><h2>Оберіть напрям</h2></div><a class="text-link" href="{% url 'catalog:product_list' %}">Усі позиції <span aria-hidden="true">↗</span></a></div>
@@ -33,8 +32,16 @@
     {% else %}<div class="empty-state"><span class="empty-mark">✦</span><h3>Готуємо перші знахідки</h3><p>Нові товари з’являться тут після додавання каталогу.</p></div>{% endif %}
 </div></section>
 
-<section class="content-section page-width" id="about"><div class="telegram-panel" id="delivery">
+<section class="content-section page-width info-row" id="about">
+<div class="delivery-panel" id="delivery">
     <div><p class="eyebrow">GromBricks / Україна</p><h2>Колекція починається<br>з однієї деталі</h2><p>Відправляємо замовлення Укрпоштою, Новою поштою та Meest.</p></div>
-    <a class="button button-outline" href="{% url 'catalog:product_list' %}">Знайти свою <span aria-hidden="true">↗</span></a><span class="telegram-mark" aria-hidden="true">G</span>
-</div></section>
+    <a class="button button-outline" href="{% url 'catalog:product_list' %}">Знайти свою <span aria-hidden="true">↗</span></a><span class="delivery-mark" aria-hidden="true">G</span>
+</div>
+<section class="telegram-panel" id="telegram" aria-labelledby="telegram-title">
+    <div><p class="eyebrow">Telegram / GromBricks</p><h2 id="telegram-title">Першими бачите новинки</h2><p>Нові надходження, рідкісні позиції та оголошення магазину — у нашому каналі.</p></div>
+    {% if telegram_channel_url %}<a class="button button-gold" href="{{ telegram_channel_url }}" target="_blank" rel="noopener noreferrer">Перейти в канал <span aria-hidden="true">↗</span></a>
+    {% else %}<span class="button button-outline button-disabled" aria-disabled="true">Посилання на канал буде додано</span>{% endif %}
+    <span class="telegram-mark" aria-hidden="true">✈</span>
+</section>
+</section>
 {% endblock %}

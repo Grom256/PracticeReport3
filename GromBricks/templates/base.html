@@ -10,10 +10,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20261019-design-2">
+    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20261020-hero-mobile-2">
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
     <a class="skip-link" href="#main-content">Перейти до вмісту</a>
     <header class="site-header">
         <div class="header-inner page-width">
@@ -30,16 +30,22 @@
                 <a href="{% url 'catalog:product_list' %}?type=part">Деталі</a>
                 <a href="{% url 'catalog:product_list' %}?rare=1">Рідкісне</a>
                 <a href="{% url 'catalog:home' %}#about">Про магазин</a>
+                <div class="nav-account">
+                    {% if user.is_authenticated %}
+                        <a class="header-account" href="{% url 'accounts:profile' %}">Профіль</a>
+                        <form class="header-logout" method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Вийти</button></form>
+                    {% else %}
+                        <a class="header-account" href="{% url 'accounts:login' %}">Увійти</a>
+                        <a class="header-account header-register" href="{% url 'accounts:register' %}">Реєстрація</a>
+                    {% endif %}
+                </div>
             </nav>
             <div class="header-actions">
-                {% if user.is_authenticated %}
-                    <a class="header-account" href="{% url 'accounts:profile' %}">Профіль</a>
-                    <form class="header-logout" method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Вийти</button></form>
-                {% else %}
-                    <a class="header-account" href="{% url 'accounts:login' %}">Увійти</a>
-                    <a class="header-account header-register" href="{% url 'accounts:register' %}">Реєстрація</a>
-                {% endif %}
-                <a class="header-cart" href="{% url 'cart:detail' %}"><span class="cart-icon" aria-hidden="true">＋</span> Кошик <span class="cart-count">{{ cart_count }}</span></a>
+                <form class="header-search" method="get" action="{% url 'catalog:product_list' %}" role="search">
+                    <input type="search" name="q" placeholder="Пошук фігурок і деталей" aria-label="Пошук по каталогу" autocomplete="off">
+                    <button class="search-toggle" type="submit" aria-label="Пошук"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+                </form>
+                <a class="header-cart" href="{% url 'cart:detail' %}" aria-label="Кошик"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h2.2l2 11h10.6l2-8H6.4"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg><span class="cart-label">Кошик</span><span class="cart-count">{{ cart_count }}</span></a>
             </div>
         </div>
     </header>

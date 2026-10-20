@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -27,6 +28,7 @@ def home(request):
         {
             'categories': categories[:1],
             'latest_products': latest_products,
+            'telegram_channel_url': settings.TELEGRAM_CHANNEL_URL,
         },
     )
 

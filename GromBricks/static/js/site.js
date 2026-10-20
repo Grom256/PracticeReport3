@@ -21,3 +21,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const search = document.querySelector('.header-search');
+    if (!search) return;
+    const input = search.querySelector('input');
+    const button = search.querySelector('.search-toggle');
+    const close = () => search.classList.remove('is-open');
+
+    button.addEventListener('click', (event) => {
+        if (!search.classList.contains('is-open')) {
+            event.preventDefault();
+            search.classList.add('is-open');
+            input.focus();
+        } else if (!input.value.trim()) {
+            event.preventDefault();
+            close();
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && search.classList.contains('is-open')) {
+            close();
+            button.focus();
+        }
+    });
+    document.addEventListener('click', (event) => {
+        if (!search.contains(event.target) && !input.value.trim()) close();
+    });
+});

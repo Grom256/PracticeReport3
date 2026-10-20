@@ -161,3 +161,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+TELEGRAM_CHANNEL_URL = os.environ.get('TELEGRAM_CHANNEL_URL', '').strip()
