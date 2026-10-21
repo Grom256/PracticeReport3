@@ -535,3 +535,61 @@ h1, h2, h3, p { margin-top: 0; }
     .header-actions { grid-column: 2; }
     .menu-toggle, .search-toggle, .header-cart { width: 36px; height: 36px; }
 }
+
+@media (min-width: 1001px) {
+    .page-auth .form-page {
+        position: relative;
+        isolation: isolate;
+        display: grid;
+        width: 100%;
+        min-height: max(620px, calc(100svh - 92px));
+        grid-template-columns: minmax(0, 1fr) minmax(400px, 520px);
+        align-items: center;
+        gap: clamp(48px, 7vw, 120px);
+        overflow: hidden;
+        padding: 64px max(32px, calc((100vw - var(--content-width)) / 2));
+        background: radial-gradient(ellipse at 75% 46%, rgba(230, 191, 85, .08), transparent 35%), #09111f;
+    }
+    .page-auth .form-page::before {
+        position: absolute;
+        z-index: 0;
+        inset: 0 41% 0 0;
+        background-image:
+            linear-gradient(90deg, rgba(9, 17, 31, .08) 30%, rgba(9, 17, 31, .48) 78%, #09111f 100%),
+            linear-gradient(0deg, rgba(9, 17, 31, .25), transparent 42%, rgba(9, 17, 31, .14)),
+            url('../images/hero-bg.webp');
+        background-position: center, center, 68% center;
+        background-size: cover;
+        content: '';
+        pointer-events: none;
+    }
+    .page-auth .form-page::after {
+        position: absolute;
+        z-index: 0;
+        top: 50%;
+        left: 2%;
+        width: clamp(380px, 42vw, 700px);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background-image:
+            radial-gradient(circle, transparent 55%, rgba(240, 207, 122, .28) 55.3%, transparent 55.8%),
+            radial-gradient(circle, transparent 70%, rgba(207, 214, 224, .16) 70.3%, transparent 70.8%),
+            radial-gradient(circle, rgba(240, 207, 122, .55) 1px, transparent 1.5px);
+        background-size: 100% 100%, 100% 100%, 28px 28px;
+        content: '';
+        opacity: .45;
+        transform: translateY(-50%);
+        mask-image: radial-gradient(ellipse, #000 28%, transparent 74%);
+        pointer-events: none;
+    }
+    .page-auth .form-panel {
+        z-index: 1;
+        grid-column: 2;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        border-color: rgba(154, 167, 191, .25);
+        background: linear-gradient(145deg, rgba(16, 27, 48, .98), rgba(9, 17, 31, .97) 75%);
+        box-shadow: 0 28px 80px rgba(0, 0, 0, .34), 0 0 60px rgba(230, 191, 85, .04);
+    }
+}

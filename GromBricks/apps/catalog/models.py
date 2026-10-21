@@ -3,6 +3,8 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.urls import reverse
 
+from .validators import validate_product_sku
+
 
 class Category(models.Model):
     name = models.CharField('назва', max_length=100, unique=True)
@@ -45,7 +47,9 @@ class Product(models.Model):
     product_type = models.CharField(
         'тип товару', max_length=12, choices=ProductType.choices
     )
-    sku = models.CharField('артикул', max_length=50, unique=True)
+    sku = models.CharField(
+        'артикул', max_length=50, unique=True, validators=[validate_product_sku]
+    )
     name = models.CharField('назва', max_length=200)
     description = models.TextField('опис', blank=True)
     series = models.CharField('серія / тематика', max_length=100, blank=True)
