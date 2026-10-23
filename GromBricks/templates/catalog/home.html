@@ -2,46 +2,384 @@
 {% load static %}
 {% block title %}GromBricks — фігурки та деталі LEGO{% endblock %}
 {% block body_class %}page-home{% endblock %}
+
+{% block extra_head %}
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <section class="hero-section">
     <img class="hero-background" src="{% static 'images/hero-bg.webp' %}" alt="" aria-hidden="true">
     <div class="page-width hero-layout">
         <div class="hero-copy">
-            <p class="eyebrow"><span class="eyebrow-line"></span> Premium LEGO collectibles</p>
+            <p class="eyebrow"><span class="eyebrow-line"></span> LEGO для колекції</p>
             <h1>Фігурки<br><span>з характером</span></h1>
             <p class="hero-description">Фігурки та деталі LEGO для колекціонерів і майстрів. Ретельно відібрані позиції, які варто мати.</p>
-            <div class="hero-actions"><a class="button button-gold" href="{% url 'catalog:product_list' %}">До каталогу <span aria-hidden="true">↗</span></a><a class="button button-outline" href="#latest">Нові надходження</a></div>
+            <div class="hero-actions"><a class="btn btn-primary button button-gold" href="{% url 'catalog:product_list' %}">До каталогу <span class="arrow-circle" aria-hidden="true">{% include 'partials/icon_arrow.html' %}</span></a><a class="btn btn-secondary button button-outline" href="#latest">Нові надходження</a><a class="btn btn-secondary button button-outline" href="{{ telegram_channel_url }}" target="_blank" rel="noopener noreferrer">Наш Telegram</a></div>
         </div>
     </div>
 </section>
-<div class="hero-trust" aria-label="Переваги магазину"><div class="page-width trust-items"><span><i>✦</i> Оригінальний LEGO</span><span><i>◈</i> Чесний опис стану</span><span><i>↗</i> Відправка по Україні</span><span><i>✧</i> Рідкісні знахідки</span></div></div>
 
-<section class="content-section catalog-directions" id="catalog-directions"><div class="page-width catalog-directions-inner">
-    <div class="section-heading"><div><p class="eyebrow">Каталог</p><h2>Оберіть напрям</h2></div><a class="text-link" href="{% url 'catalog:product_list' %}">Усі позиції <span aria-hidden="true">↗</span></a></div>
-    <div class="category-grid">
-        <a class="category-card category-card-figure" href="{% url 'catalog:product_list' %}?type=minifigure"><span class="category-number">01 / Колекція</span><span class="category-content"><span class="category-title">Мініфігурки</span><span class="category-action">Дивитись <b>→</b></span></span></a>
-        <a class="category-card category-card-parts" href="{% url 'catalog:product_list' %}?type=part"><span class="category-number">02 / Деталі</span><span class="category-content"><span class="category-title">Окремі деталі</span><span class="category-action">Дивитись <b>→</b></span></span></a>
-        <a class="category-card category-card-rare" href="{% url 'catalog:product_list' %}?rare=1"><span class="category-number">03 / Особлива добірка</span><span class="category-content"><span class="category-title">Рідкісне</span><span class="category-action">Дивитись <b>→</b></span></span></a>
-        {% for category in categories %}<a class="category-card category-card-theme" href="{% url 'catalog:product_list' %}?category={{ category.slug|urlencode }}"><span class="category-number">Тематична добірка</span><span class="category-content"><span class="category-title">{{ category.name }}</span><span class="category-action">Дивитись <b>→</b></span></span></a>{% endfor %}
+<section class="content-section viewer3d-section" aria-labelledby="viewer3d-title">
+    <div class="page-width viewer3d-layout">
+        <div class="viewer3d-copy">
+            <p class="eyebrow"><span class="eyebrow-line"></span> Інтерактивний 3D-огляд</p>
+            <h2 id="viewer3d-title"><span id="viewer3dModelName">Cole Jungle</span><br><span>з усіх боків</span></h2>
+            <p class="viewer3d-desc" id="viewer3dModelDesc">Майстер Землі у джунглевому спорядженні. Потужна чорна броня, коричневі ремені та фірмова пов’язка ніндзя.</p>
+
+            <div class="viewer3d-switcher" role="tablist" aria-label="Вибір 3D-фігурки LEGO">
+                <button type="button" class="viewer3d-btn is-active" data-model="cole_jungle" role="tab" aria-selected="true">
+                    Cole Jungle
+                </button>
+                <button type="button" class="viewer3d-btn" data-model="kai_jungle" role="tab" aria-selected="false">
+                    Kai Jungle
+                </button>
+                <button type="button" class="viewer3d-btn" data-model="golden_ninja" role="tab" aria-selected="false">
+                    Golden Ninja
+                </button>
+            </div>
+
+            <p class="viewer3d-hint" aria-hidden="true">
+                <span class="viewer3d-hint-icon">⟳</span> Тягни для обертання • Коліщатко для наближення
+            </p>
+        </div>
+        <div class="viewer3d-stage">
+            <div id="viewer3dLoading" class="viewer3d-loading" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--gold-bright, #e6bf55); font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(7, 15, 29, 0.7); z-index: 2; transition: opacity 0.35s ease; pointer-events: none;">
+                Завантаження моделі...
+            </div>
+            <canvas id="minifigCanvas" aria-label="Інтерактивна 3D-модель фігурки LEGO"></canvas>
+        </div>
+    </div>
+</section>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
+const canvas = document.getElementById('minifigCanvas');
+const loadingEl = document.getElementById('viewer3dLoading');
+const nameEl = document.getElementById('viewer3dModelName');
+const descEl = document.getElementById('viewer3dModelDesc');
+const switcherBtns = document.querySelectorAll('.viewer3d-btn');
+
+if (!canvas) throw new Error('canvas not found');
+
+// --- Models Dictionary ---
+const modelsData = {
+    cole_jungle: {
+        name: 'Cole Jungle',
+        desc: 'Майстер Землі у джунглевому спорядженні. Потужна чорна броня, коричневі ремені та фірмова пов’язка ніндзя.',
+        obj: 'cole_jungle.obj',
+        mtl: 'cole_jungle.mtl',
+    },
+    kai_jungle: {
+        name: 'Kai Jungle',
+        desc: 'Майстер Вогню у камуфляжному кімоно. Яскраві червоні акценти, маска воїна та деталізований тактичний принт.',
+        obj: 'kai_jungle.obj',
+        mtl: 'kai_jungle.mtl',
+    },
+    golden_ninja: {
+        name: 'Golden Ninja',
+        desc: 'Легендарний Золотий Ніндзя. Сяюча золота броня, смарагдові елементи та найвища сила Першого Майстра Спінджіцу.',
+        obj: 'golden_ninja.obj',
+        mtl: 'golden_ninja.mtl',
+    },
+};
+
+const modelsPath = "{% static 'models/' %}";
+const loadedModelsCache = new Map();
+let currentObject = null;
+let currentKey = null;
+
+// --- Renderer ---
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+// --- Scene ---
+const scene = new THREE.Scene();
+
+// --- Camera ---
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+camera.position.set(0, 0.6, 6.2);
+
+// --- Lights ---
+const ambient = new THREE.AmbientLight(0xffffff, 1.4);
+scene.add(ambient);
+
+const keyLight = new THREE.DirectionalLight(0xfff8e7, 2.0);
+keyLight.position.set(4, 6, 5);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(1024, 1024);
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x9fc0eb, 1.2);
+fillLight.position.set(-5, 3, -2);
+scene.add(fillLight);
+
+const backLight = new THREE.DirectionalLight(0xe6bf55, 1.5);
+backLight.position.set(0, 4, -5);
+scene.add(backLight);
+
+const bottomLight = new THREE.DirectionalLight(0x314668, 0.8);
+bottomLight.position.set(0, -3, 2);
+scene.add(bottomLight);
+
+// --- Shadow plane ---
+const shadowPlane = new THREE.Mesh(
+    new THREE.CircleGeometry(1.6, 48),
+    new THREE.MeshStandardMaterial({
+        color: 0x02060f,
+        transparent: true,
+        opacity: 0.45,
+        roughness: 1,
+    })
+);
+shadowPlane.rotation.x = -Math.PI / 2;
+shadowPlane.position.y = -1.8;
+shadowPlane.receiveShadow = true;
+scene.add(shadowPlane);
+
+// --- OrbitControls ---
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 3.0;
+controls.maxDistance = 10;
+controls.minPolarAngle = Math.PI * 0.15;
+controls.maxPolarAngle = Math.PI * 0.82;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 1.6;
+controls.target.set(0, 0, 0);
+
+let idleTimer = null;
+renderer.domElement.addEventListener('pointerdown', () => {
+    controls.autoRotate = false;
+    clearTimeout(idleTimer);
+});
+renderer.domElement.addEventListener('pointerup', () => {
+    idleTimer = setTimeout(() => { controls.autoRotate = true; }, 3000);
+});
+
+// --- Model Loader Function ---
+function showLoading(text) {
+    if (loadingEl) {
+        loadingEl.textContent = text;
+        loadingEl.style.opacity = '1';
+        loadingEl.style.display = 'flex';
+    }
+}
+
+function hideLoading() {
+    if (loadingEl) {
+        loadingEl.style.opacity = '0';
+        setTimeout(() => {
+            if (loadingEl.style.opacity === '0') {
+                loadingEl.style.display = 'none';
+            }
+        }, 350);
+    }
+}
+
+function switchModel(key) {
+    if (currentKey === key && currentObject) return;
+    const config = modelsData[key];
+    if (!config) return;
+
+    currentKey = key;
+
+    // Update UI text
+    if (nameEl) nameEl.textContent = config.name;
+    if (descEl) descEl.textContent = config.desc;
+
+    // Update buttons
+    switcherBtns.forEach((btn) => {
+        const active = btn.getAttribute('data-model') === key;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-selected', String(active));
+    });
+
+    // Check if model already cached
+    if (loadedModelsCache.has(key)) {
+        if (currentObject) scene.remove(currentObject);
+        currentObject = loadedModelsCache.get(key);
+        scene.add(currentObject);
+
+        // Adjust shadow plane position
+        const finalBox = new THREE.Box3().setFromObject(currentObject);
+        shadowPlane.position.y = finalBox.min.y - 0.02;
+
+        hideLoading();
+        return;
+    }
+
+    // Load from server
+    showLoading(`Завантаження ${config.name}...`);
+
+    const mtlLoader = new MTLLoader();
+    mtlLoader.setPath(modelsPath);
+
+    mtlLoader.load(
+        config.mtl,
+        (materials) => {
+            materials.preload();
+
+            for (const matName in materials.materials) {
+                const mat = materials.materials[matName];
+                mat.transparent = false;
+                mat.opacity = 1.0;
+                mat.side = THREE.DoubleSide;
+            }
+
+            const objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.setPath(modelsPath);
+
+            objLoader.load(
+                config.obj,
+                (object) => {
+                    // Check if user switched to another model while loading
+                    if (currentKey !== key) {
+                        loadedModelsCache.set(key, object);
+                        return;
+                    }
+
+                    // Auto-center and normalize size
+                    const bbox = new THREE.Box3().setFromObject(object);
+                    const size = bbox.getSize(new THREE.Vector3());
+                    const center = bbox.getCenter(new THREE.Vector3());
+
+                    // Center at (0, 0, 0)
+                    object.position.sub(center);
+
+                    // Scale to fit viewport (~3.6 units tall)
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    if (maxDim > 0) {
+                        const targetSize = 3.6;
+                        const scale = targetSize / maxDim;
+                        object.scale.set(scale, scale, scale);
+
+                        const scaledBox = new THREE.Box3().setFromObject(object);
+                        const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+                        object.position.sub(scaledCenter);
+
+                        const finalBox = new THREE.Box3().setFromObject(object);
+                        shadowPlane.position.y = finalBox.min.y - 0.02;
+                    }
+
+                    object.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                            if (child.material) {
+                                child.material.side = THREE.DoubleSide;
+                                child.material.transparent = false;
+                                child.material.opacity = 1.0;
+                            }
+                        }
+                    });
+
+                    if (currentObject) scene.remove(currentObject);
+                    currentObject = object;
+                    loadedModelsCache.set(key, object);
+                    scene.add(object);
+
+                    hideLoading();
+                },
+                (xhr) => {
+                    if (loadingEl && xhr.total > 0 && currentKey === key) {
+                        const percent = Math.round((xhr.loaded / xhr.total) * 100);
+                        loadingEl.textContent = `Завантаження ${config.name}: ${percent}%`;
+                    }
+                },
+                (err) => {
+                    console.error('Помилка завантаження .obj файлу:', err);
+                    if (loadingEl && currentKey === key) {
+                        loadingEl.textContent = 'Помилка завантаження моделі';
+                        loadingEl.style.color = '#ef4444';
+                    }
+                }
+            );
+        },
+        null,
+        (err) => {
+            console.error('Помилка завантаження .mtl файлу:', err);
+            if (loadingEl && currentKey === key) {
+                loadingEl.textContent = 'Помилка завантаження матеріалів';
+                loadingEl.style.color = '#ef4444';
+            }
+        }
+    );
+}
+
+// Bind switcher buttons
+switcherBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+        const modelKey = btn.getAttribute('data-model');
+        switchModel(modelKey);
+    });
+});
+
+// Initial load (Cole Jungle)
+switchModel('cole_jungle');
+
+// --- Resize ---
+function resize() {
+    const stage = canvas.parentElement;
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+    if (w === 0 || h === 0) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+}
+resize();
+new ResizeObserver(resize).observe(canvas.parentElement);
+
+// --- Animate ---
+(function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+})();
+</script>
+
+<section class="content-section benefits-section"><div class="page-width">
+    <div class="section-heading"><div><p class="eyebrow">GromBricks / Переваги</p><h2>Чому обирають нас</h2></div></div>
+    <div class="benefits-grid">
+        <article class="benefit-card"><span class="benefit-icon" aria-hidden="true">✦</span><h3>Оригінальний LEGO</h3><p>У каталозі — оригінальні фігурки та деталі LEGO.</p></article>
+        <article class="benefit-card"><span class="benefit-icon" aria-hidden="true">◈</span><h3>Чесний опис стану</h3><p>Для кожної позиції вказуємо, нова вона чи вживана.</p></article>
+        <article class="benefit-card"><span class="benefit-icon" aria-hidden="true">⌖</span><h3>Відправка по Україні</h3><p>Доставляємо Укрпоштою, Новою поштою та Meest.</p></article>
+        <article class="benefit-card"><span class="benefit-icon" aria-hidden="true">✓</span><h3>Накладений платіж</h3><p>Оплата замовлення під час отримання посилки.</p></article>
+        <article class="benefit-card"><span class="benefit-icon" aria-hidden="true">✈</span><h3>Новинки в Telegram</h3><p>Анонсуємо нові надходження в каналі GromBricks.</p></article>
     </div>
 </div></section>
 
 <section class="content-section arrivals-section" id="latest"><div class="page-width">
-    <div class="section-heading"><div><p class="eyebrow">Нові надходження</p><h2>Щойно в наявності</h2></div><a class="text-link" href="{% url 'catalog:product_list' %}">Усі позиції <span aria-hidden="true">↗</span></a></div>
+    <div class="section-heading"><div><p class="eyebrow">Нові надходження</p><h2>Щойно в наявності</h2></div><a class="text-link" href="{% url 'catalog:product_list' %}">Усі позиції {% include 'partials/icon_arrow.html' %}</a></div>
     {% if latest_products %}<div class="product-grid">{% for product in latest_products %}{% include 'catalog/partials/product_card.html' %}{% endfor %}</div>
-    {% else %}<div class="empty-state"><span class="empty-mark">✦</span><h3>Готуємо перші знахідки</h3><p>Нові товари з’являться тут після додавання каталогу.</p></div>{% endif %}
+    {% else %}<div class="empty-state"><span class="empty-mark">✦</span><h3>Готуємо перші знахідки</h3><p>Нові товари з'являться тут після додавання каталогу.</p></div>{% endif %}
 </div></section>
 
 <section class="content-section page-width info-row" id="about">
 <div class="delivery-panel" id="delivery">
-    <div><p class="eyebrow">GromBricks / Україна</p><h2>Колекція починається<br>з однієї деталі</h2><p>Відправляємо замовлення Укрпоштою, Новою поштою та Meest.</p></div>
-    <a class="button button-outline" href="{% url 'catalog:product_list' %}">Знайти свою <span aria-hidden="true">↗</span></a><span class="delivery-mark" aria-hidden="true">G</span>
+    <div><p class="eyebrow">GromBricks / Україна</p><h2>Колекція починається<br>з однієї деталі</h2><p>Відправляємо замовлення Укрпоштою, Новою поштою та Meest. Оплата — накладеним платежем при отриманні.</p><a class="text-link" href="{{ telegram_channel_url }}" target="_blank" rel="noopener noreferrer">Зв'язатися через Telegram {% include 'partials/icon_arrow.html' %}</a></div>
+    <a class="btn btn-secondary button button-outline" href="{% url 'catalog:product_list' %}">Знайти свою <span class="arrow-circle" aria-hidden="true">{% include 'partials/icon_arrow.html' %}</span></a><span class="delivery-mark" aria-hidden="true">G</span>
 </div>
 <section class="telegram-panel" id="telegram" aria-labelledby="telegram-title">
     <div><p class="eyebrow">Telegram / GromBricks</p><h2 id="telegram-title">Першими бачите новинки</h2><p>Нові надходження, рідкісні позиції та оголошення магазину — у нашому каналі.</p></div>
-    {% if telegram_channel_url %}<a class="button button-gold" href="{{ telegram_channel_url }}" target="_blank" rel="noopener noreferrer">Перейти в канал <span aria-hidden="true">↗</span></a>
-    {% else %}<span class="button button-outline button-disabled" aria-disabled="true">Посилання на канал буде додано</span>{% endif %}
-    <span class="telegram-mark" aria-hidden="true">✈</span>
+    <a class="btn btn-primary button button-gold" href="{{ telegram_channel_url }}" target="_blank" rel="noopener noreferrer">Перейти в канал <span class="arrow-circle" aria-hidden="true">{% include 'partials/icon_arrow.html' %}</span></a>
+    <span class="telegram-mark" aria-hidden="true">{% include 'partials/icon_telegram.html' %}</span>
 </section>
 </section>
 {% endblock %}

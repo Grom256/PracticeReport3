@@ -11,7 +11,7 @@
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ next }}">
             {% include 'accounts/partials/form_fields.html' %}
-            <button class="button button-gold" type="submit">Увійти</button>
+            <button class="btn btn-primary button button-gold" type="submit">Увійти</button>
         </form>
         <p class="form-footnote">Ще не маєш акаунта? <a href="{% url 'accounts:register' %}">Зареєструватися</a></p>
     </div>

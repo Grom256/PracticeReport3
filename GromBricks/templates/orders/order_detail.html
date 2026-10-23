@@ -15,9 +15,9 @@
         <aside class="order-info-panel">
             <h2>Доставка й оплата</h2>
             <dl class="order-info-list"><div><dt>Одержувач</dt><dd>{{ order.recipient_name }}</dd></div><div><dt>Телефон</dt><dd>{{ order.phone }}</dd></div><div><dt>Місто</dt><dd>{{ order.city }}</dd></div><div><dt>Адреса / відділення</dt><dd>{{ order.address }}{% if order.postal_code %}, {{ order.postal_code }}{% endif %}</dd></div><div><dt>Перевізник</dt><dd>{{ order.get_delivery_service_display }}</dd></div><div><dt>Оплата</dt><dd>{{ order.get_payment_method_display }}</dd></div></dl>
-            {% if order.status == 'pending' or order.status == 'processing' %}<div class="payment-note"><strong>Оплата переказом</strong><p>Сайт не проводить платіж автоматично. Реквізити магазину ще не налаштовані; повні дані банківських карток на сайті не збираються.</p></div>{% endif %}
+            <div class="payment-note"><strong>Оплата при отриманні</strong><p>Замовлення оплачується накладеним платежем під час отримання посилки.</p></div>
         </aside>
     </div>
-    <a class="text-link order-back-link" href="{% url 'orders:list' %}">← До історії замовлень</a>
+    <a class="text-link order-back-link" href="{% url 'orders:list' %}">{% include 'partials/icon_arrow.html' %} До історії замовлень</a>
 </section>
 {% endblock %}

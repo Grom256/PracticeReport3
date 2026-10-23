@@ -9,6 +9,6 @@
         <h3><a href="{% url 'catalog:product_detail' product.pk %}">{{ product.name }}</a></h3>
         <p class="product-series">{% if product.series %}{{ product.series }}{% else %}{{ product.category.name }}{% endif %}</p>
         <div class="product-card-bottom"><strong>{{ product.price|floatformat:2 }} <small>₴</small></strong>{% if product.stock_quantity > 0 %}<span class="stock-label">В наявності</span>{% else %}<span class="stock-label stock-none">Немає</span>{% endif %}</div>
-        <a class="product-open-link" href="{% url 'catalog:product_detail' product.pk %}">Детальніше <span aria-hidden="true">↗</span></a>
+        <a class="product-open-link" href="{% url 'catalog:product_detail' product.pk %}">Детальніше {% include 'partials/icon_arrow.html' %}</a>
     </div>
 </article>

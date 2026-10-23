@@ -15,7 +15,6 @@ class OrderCheckoutForm(forms.ModelForm):
             'address',
             'postal_code',
             'delivery_service',
-            'payment_method',
         )
         widgets = {
             'recipient_name': forms.TextInput(attrs={'autocomplete': 'name'}),

@@ -9,7 +9,7 @@
                 <article class="cart-row">
                     <div class="cart-product">
                         <a class="cart-product-name" href="{% url 'catalog:product_detail' item.product.id %}">{{ item.product.name }}</a>
-                        <span>{{ item.product.sku }} · {{ item.product.get_product_type_display }}</span>
+                        <span class="cart-product-meta">{{ item.product.sku }} · {{ item.product.get_product_type_display }}</span>
                         {% if not item.product.is_active or not item.product.category.is_active %}<strong class="field-error">Товар більше недоступний у каталозі.</strong>
                         {% elif item.quantity > item.product.stock_quantity %}<strong class="field-error">На складі залишилося {{ item.product.stock_quantity }} шт.</strong>{% endif %}
                     </div>
@@ -17,7 +17,7 @@
                     {% if item.product.is_active and item.product.category.is_active and item.product.stock_quantity %}
                         <form class="cart-quantity-form" method="post" action="{% url 'cart:update' item.product.id %}">
                             {% csrf_token %}<label class="sr-only" for="quantity-{{ item.product.id }}">Кількість {{ item.product.name }}</label>
-                            <input id="quantity-{{ item.product.id }}" type="number" name="quantity" min="1" max="{{ item.product.stock_quantity }}" value="{{ item.quantity }}" required>
+                            <input id="quantity-{{ item.product.id }}" type="number" name="quantity" min="1" {% if item.product.stock_quantity > 999 %}max="999"{% else %}max="{{ item.product.stock_quantity }}"{% endif %} step="1" inputmode="numeric" value="{{ item.quantity }}" required>
                             <button class="text-button" type="submit">Оновити</button>
                         </form>
                     {% else %}<span class="cart-unavailable">Недоступний</span>{% endif %}
@@ -27,9 +27,9 @@
             {% endfor %}
         </div>
         <div class="cart-summary"><span>Разом за товари</span><strong>{{ total|floatformat:2 }} ₴</strong></div>
-        <div class="cart-checkout-actions"><p class="detail-note">Товари не резервуються до підтвердження замовлення.</p><a class="button button-gold" href="{% url 'orders:checkout' %}">Оформити замовлення <span aria-hidden="true">↗</span></a></div>
+        <div class="cart-checkout-actions"><p class="detail-note">Товари не резервуються до підтвердження замовлення.</p><a class="btn btn-primary button button-gold" href="{% url 'orders:checkout' %}">Оформити замовлення <span class="arrow-circle" aria-hidden="true">{% include 'partials/icon_arrow.html' %}</span></a><p class="detail-note">Оплата: накладений платіж при отриманні.</p></div>
     {% else %}
-        <div class="empty-state"><span class="empty-mark">＋</span><h2>Кошик поки порожній</h2><p>Переглянь каталог і додай товари, які сподобалися.</p><a class="button button-gold" href="{% url 'catalog:product_list' %}">До каталогу</a></div>
+        <div class="empty-state"><span class="empty-mark">＋</span><h2>Кошик поки порожній</h2><p>Переглянь каталог і додай товари, які сподобалися.</p><a class="btn btn-primary button button-gold" href="{% url 'catalog:product_list' %}">До каталогу</a></div>
     {% endif %}
 </section>
 {% endblock %}

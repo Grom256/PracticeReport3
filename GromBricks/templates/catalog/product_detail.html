@@ -17,12 +17,12 @@
             <dl class="product-specs">{% if product.series %}<div><dt>Серія / тематика</dt><dd>{{ product.series }}</dd></div>{% endif %}{% if product.color %}<div><dt>Колір</dt><dd>{{ product.color }}</dd></div>{% endif %}<div><dt>Стан</dt><dd>{{ product.get_condition_display }}</dd></div><div><dt>Артикул</dt><dd>{{ product.sku }}</dd></div></dl>
             {% if product.stock_quantity %}
                 {% if user.is_authenticated %}
-                    <form class="add-to-cart-form" method="post" action="{% url 'cart:add' product.id %}">{% csrf_token %}<label for="id_quantity">Кількість</label><input id="id_quantity" type="number" name="quantity" min="1" max="{{ product.stock_quantity }}" value="1" required><button class="button button-gold" type="submit">Додати до кошика</button></form>
+                    <form class="add-to-cart-form" method="post" action="{% url 'cart:add' product.id %}">{% csrf_token %}<label for="id_quantity">Кількість</label><input id="id_quantity" type="number" name="quantity" min="1" {% if product.stock_quantity > 999 %}max="999"{% else %}max="{{ product.stock_quantity }}"{% endif %} step="1" inputmode="numeric" value="1" required><button class="btn btn-primary button button-gold" type="submit">Додати до кошика</button></form>
                 {% else %}
                     <p class="detail-note"><a href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Увійди, щоб додати товар до кошика.</a></p>
                 {% endif %}
             {% endif %}
-            <a class="button button-outline" href="{% url 'catalog:product_list' %}">← Повернутися до каталогу</a>
+            <a class="btn btn-secondary button button-outline" href="{% url 'catalog:product_list' %}">{% include 'partials/icon_arrow.html' %} Повернутися до каталогу</a>
         </div>
     </div>
 </section>

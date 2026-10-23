@@ -16,10 +16,10 @@
     {% if page_obj.object_list %}
         <div class="product-grid">{% for product in page_obj.object_list %}{% include 'catalog/partials/product_card.html' %}{% endfor %}</div>
         {% if page_obj.has_other_pages %}<nav class="pagination" aria-label="Сторінки каталогу">
-            {% if page_obj.has_previous %}<a href="?{% if query %}q={{ query|urlencode }}&{% endif %}type={{ selected_type }}&category={{ selected_category|urlencode }}&sort={{ selected_sort }}{% if in_stock %}&in_stock=1{% endif %}{% if rare_only %}&rare=1{% endif %}&page={{ page_obj.previous_page_number }}" aria-label="Попередня сторінка">←</a>{% endif %}
+            {% if page_obj.has_previous %}<a href="?{% if query %}q={{ query|urlencode }}&{% endif %}type={{ selected_type }}&category={{ selected_category|urlencode }}&sort={{ selected_sort }}{% if in_stock %}&in_stock=1{% endif %}{% if rare_only %}&rare=1{% endif %}&page={{ page_obj.previous_page_number }}" aria-label="Попередня сторінка"><span class="icon-arrow icon-arrow-back">{% include 'partials/icon_arrow.html' %}</span></a>{% endif %}
             <span>Сторінка {{ page_obj.number }} з {{ page_obj.paginator.num_pages }}</span>
-            {% if page_obj.has_next %}<a href="?{% if query %}q={{ query|urlencode }}&{% endif %}type={{ selected_type }}&category={{ selected_category|urlencode }}&sort={{ selected_sort }}{% if in_stock %}&in_stock=1{% endif %}{% if rare_only %}&rare=1{% endif %}&page={{ page_obj.next_page_number }}" aria-label="Наступна сторінка">→</a>{% endif %}
+            {% if page_obj.has_next %}<a href="?{% if query %}q={{ query|urlencode }}&{% endif %}type={{ selected_type }}&category={{ selected_category|urlencode }}&sort={{ selected_sort }}{% if in_stock %}&in_stock=1{% endif %}{% if rare_only %}&rare=1{% endif %}&page={{ page_obj.next_page_number }}" aria-label="Наступна сторінка">{% include 'partials/icon_arrow.html' %}</a>{% endif %}
         </nav>{% endif %}
-    {% else %}<div class="empty-state"><span class="empty-mark">⌕</span><h2>Нічого не знайшлося</h2><p>Спробуйте змінити пошуковий запит або скинути фільтри.</p><a class="button button-outline" href="{% url 'catalog:product_list' %}">Показати весь каталог</a></div>{% endif %}
+    {% else %}<div class="empty-state"><span class="empty-mark">⌕</span><h2>Нічого не знайшлося</h2><p>Спробуйте змінити пошуковий запит або скинути фільтри.</p><a class="btn btn-secondary button button-outline" href="{% url 'catalog:product_list' %}">Показати весь каталог</a></div>{% endif %}
 </section>
 {% endblock %}

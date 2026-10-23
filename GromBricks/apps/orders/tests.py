@@ -35,6 +35,7 @@ class OrderFlowTests(TestCase):
             'address': 'Відділення №1',
             'postal_code': '',
             'delivery_service': 'nova_poshta',
+            # A client-supplied payment choice must not replace the server choice.
             'payment_method': 'bank_transfer',
         }
 
@@ -42,6 +43,7 @@ class OrderFlowTests(TestCase):
         response = self.client.post(reverse('orders:checkout'), self.checkout_data)
 
         order = Order.objects.get(user=self.user)
+        self.assertEqual(order.payment_method, Order.PaymentMethod.CASH_ON_DELIVERY)
         self.assertRedirects(response, reverse('orders:detail', args=[order.pk]))
         item = OrderItem.objects.get(order=order, product=self.product)
         self.assertEqual(item.quantity, 2)
@@ -62,6 +64,16 @@ class OrderFlowTests(TestCase):
         self.assertRedirects(response, reverse('cart:detail'))
         self.assertFalse(Order.objects.filter(user=self.user).exists())
         self.assertEqual(self.client.session['cart'][str(self.product.pk)]['quantity'], 2)
+
+    def test_checkout_rejects_session_quantity_above_cart_limit(self):
+        session = self.client.session
+        session['cart'][str(self.product.pk)]['quantity'] = 1000
+        session.save()
+
+        response = self.client.post(reverse('orders:checkout'), self.checkout_data)
+
+        self.assertRedirects(response, reverse('cart:detail'))
+        self.assertFalse(Order.objects.filter(user=self.user).exists())
 
     def test_order_history_and_detail_are_private_to_owner(self):
         response = self.client.post(reverse('orders:checkout'), self.checkout_data)

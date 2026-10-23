@@ -1,7 +1,7 @@
+
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -12,7 +12,6 @@ from .models import Category, Product
 
 
 def home(request):
-    categories = Category.objects.filter(is_active=True)
     latest_products = (
         Product.objects.filter(
             is_active=True,
@@ -26,9 +25,7 @@ def home(request):
         request,
         'catalog/home.html',
         {
-            'categories': categories[:1],
             'latest_products': latest_products,
-            'telegram_channel_url': settings.TELEGRAM_CHANNEL_URL,
         },
     )
 
@@ -112,19 +109,23 @@ class ProductDetailView(DetailView):
         )
 
 
-class ProductManageListView(LoginRequiredMixin, ListView):
+class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """Only staff may access catalog management views."""
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+
+class ProductManageListView(StaffRequiredMixin, ListView):
     model = Product
     template_name = 'catalog/product_manage_list.html'
     context_object_name = 'products'
 
     def get_queryset(self):
-        queryset = Product.objects.select_related('category', 'owner')
-        if self.request.user.is_staff:
-            return queryset
-        return queryset.filter(owner=self.request.user)
+        return Product.objects.select_related('category', 'owner')
 
 
-class ProductCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class ProductCreateView(StaffRequiredMixin, SuccessMessageMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
@@ -138,16 +139,13 @@ class ProductCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return reverse_lazy('catalog:product_manage_list')
 
 
-class OwnedProductMixin(LoginRequiredMixin):
+class OwnedProductMixin(StaffRequiredMixin):
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
 
     def get_queryset(self):
-        queryset = Product.objects.select_related('category', 'owner')
-        if self.request.user.is_staff:
-            return queryset
-        return queryset.filter(owner=self.request.user)
+        return Product.objects.select_related('category', 'owner')
 
 
 class ProductUpdateView(OwnedProductMixin, SuccessMessageMixin, UpdateView):

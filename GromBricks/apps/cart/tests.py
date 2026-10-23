@@ -1,9 +1,13 @@
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.db import connection
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
+from django.test.utils import CaptureQueriesContext
 
+from .cart import Cart
 from apps.catalog.models import Category, Product
 
 User = get_user_model()
@@ -33,6 +37,10 @@ class SessionCartTests(TestCase):
             reverse('catalog:product_detail', args=[self.product.pk]),
         )
         self.assertEqual(self.client.session['cart'][str(self.product.pk)]['quantity'], 2)
+        self.client.post(
+            reverse('cart:update', args=[self.product.pk]), {'quantity': 3}
+        )
+        self.assertEqual(self.client.session['cart'][str(self.product.pk)]['quantity'], 2)
 
         response = self.client.get(reverse('cart:detail'))
         self.assertEqual(response.status_code, 200)
@@ -52,10 +60,45 @@ class SessionCartTests(TestCase):
         )
         self.assertEqual(self.client.session['cart'][str(self.product.pk)]['quantity'], 2)
 
-        self.client.post(
-            reverse('cart:update', args=[self.product.pk]), {'quantity': 3}
+    def test_add_rejects_malformed_or_out_of_range_quantities(self):
+        for quantity in ('abc', '-1', '0', '1.5', '1000', '9' * 5000):
+            with self.subTest(quantity=str(quantity)[:20]):
+                self.client.post(
+                    reverse('cart:add', args=[self.product.pk]), {'quantity': quantity}
+                )
+                self.assertEqual(self.client.session.get('cart', {}), {})
+
+    def test_update_rejects_malformed_quantities_without_changing_cart(self):
+        self.client.post(reverse('cart:add', args=[self.product.pk]), {'quantity': 1})
+        for quantity in ('abc', '-1', '0', '1.5', '1000'):
+            with self.subTest(quantity=quantity):
+                self.client.post(
+                    reverse('cart:update', args=[self.product.pk]), {'quantity': quantity}
+                )
+                self.assertEqual(self.client.session['cart'][str(self.product.pk)]['quantity'], 1)
+
+    def test_cart_loads_all_products_in_one_query(self):
+        second_product = Product.objects.create(
+            category=self.category,
+            product_type=Product.ProductType.PART,
+            sku='PART-002',
+            name='Срібна деталь',
+            condition=Product.Condition.NEW,
+            price=Decimal('10.00'),
+            stock_quantity=2,
         )
-        self.assertEqual(self.client.session['cart'][str(self.product.pk)]['quantity'], 2)
+        request = RequestFactory().get('/cart/')
+        SessionMiddleware(lambda _request: None).process_request(request)
+        request.session['cart'] = {
+            str(self.product.pk): {'quantity': 1},
+            str(second_product.pk): {'quantity': 1},
+        }
+
+        with CaptureQueriesContext(connection) as queries:
+            items = list(Cart(request))
+
+        self.assertEqual(len(items), 2)
+        self.assertEqual(len(queries), 1)
 
     def test_guest_cannot_add_to_cart(self):
         self.client.logout()

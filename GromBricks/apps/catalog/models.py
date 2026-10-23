@@ -71,6 +71,11 @@ class Product(models.Model):
         ordering = ['name']
         verbose_name = 'товар'
         verbose_name_plural = 'товари'
+        indexes = [
+            models.Index(fields=['name']),
+            models.Index(fields=['product_type']),
+            models.Index(fields=['-created_at']),
+        ]
         constraints = [
             models.CheckConstraint(condition=models.Q(price__gte=0), name='product_price_nonnegative'),
         ]

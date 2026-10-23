@@ -73,3 +73,26 @@ class ProfileForm(forms.ModelForm):
             user.email = self.cleaned_data['email']
             user.save(update_fields=('first_name', 'last_name', 'email'))
         return profile
+
+class EmailVerificationForm(forms.Form):
+    code = forms.CharField(
+        label='??? ????????????? ? ?????',
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': '123456',
+                'autocomplete': 'one-time-code',
+                'pattern': '[0-9]{6}',
+                'maxlength': '6',
+                'autofocus': True,
+            }
+        ),
+    )
+
+    def clean_code(self):
+        code = self.cleaned_data['code'].strip()
+        if not code.isdigit() or len(code) != 6:
+            raise forms.ValidationError('??? ??? ?????????? ????? ? 6 ????.')
+        return code
+

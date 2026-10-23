@@ -5,15 +5,20 @@
     <div class="form-panel">
         <p class="eyebrow">GromBricks / Особистий кабінет</p>
         <h1>Мій <span>профіль</span></h1>
-        <p class="form-intro">Логін: <strong>{{ request.user.username }}</strong></p>
+        <p class="form-intro">
+            Логін: <strong>{{ request.user.username }}</strong>
+            {% if profile.is_email_verified %}
+                <span class="badge-verified" style="display: inline-block; margin-left: 0.5rem; padding: 0.2rem 0.6rem; font-size: 0.8rem; border-radius: 4px; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3);">✓ Пошта підтверджена</span>
+            {% endif %}
+        </p>
         <form method="post" class="site-form">
             {% csrf_token %}
             {% include 'accounts/partials/form_fields.html' %}
-            <button class="button button-gold" type="submit">Зберегти зміни</button>
+            <button class="btn btn-primary button button-gold" type="submit">Зберегти зміни</button>
         </form>
-        <a class="text-link profile-orders-link" href="{% url 'cart:detail' %}">Перейти до кошика <span aria-hidden="true">↗</span></a>
-        <a class="text-link profile-orders-link" href="{% url 'orders:list' %}">Історія замовлень <span aria-hidden="true">↗</span></a>
-        <a class="text-link profile-orders-link" href="{% url 'catalog:product_manage_list' %}">Керування моїми товарами <span aria-hidden="true">↗</span></a>
+        <a class="text-link profile-orders-link" href="{% url 'cart:detail' %}">Перейти до кошика {% include 'partials/icon_arrow.html' %}</a>
+        <a class="text-link profile-orders-link" href="{% url 'orders:list' %}">Історія замовлень {% include 'partials/icon_arrow.html' %}</a>
+        {% if request.user.is_staff %}<a class="text-link profile-orders-link" href="{% url 'catalog:product_manage_list' %}">Керування каталогом</a>{% endif %}
     </div>
 </section>
 {% endblock %}

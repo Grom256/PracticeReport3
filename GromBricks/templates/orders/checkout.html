@@ -9,8 +9,8 @@
             <form method="post" class="site-form checkout-form">
                 {% csrf_token %}
                 {% include 'accounts/partials/form_fields.html' %}
-                <div class="payment-note"><strong>Переказ на картку / рахунок</strong><p>Це навчальний сценарій: сайт не проводить банківські платежі й не запитує реквізити твоєї картки. Реквізити магазину ще не налаштовані.</p></div>
-                <button class="button button-gold" type="submit">Підтвердити замовлення</button>
+                <div class="payment-note"><strong>Оплата при отриманні</strong><p>Єдиний спосіб оплати — накладений платіж. Сплатиш замовлення під час отримання посилки у службі доставки.</p></div>
+                <button class="btn btn-primary button button-gold" type="submit">Підтвердити замовлення</button>
             </form>
         </div>
         <aside class="checkout-summary" aria-label="Підсумок кошика">
@@ -19,6 +19,7 @@
                 {% for item in cart_items %}<li><span>{{ item.product.name }} <small>× {{ item.quantity }}</small></span><strong>{{ item.line_total|floatformat:2 }} ₴</strong></li>{% endfor %}
             </ul>
             <div class="checkout-total"><span>Разом за товари</span><strong>{{ total|floatformat:2 }} ₴</strong></div>
+            <p class="checkout-payment-summary">Оплата: накладений платіж (при отриманні).</p>
             <p>Вартість доставки не включена в суму товарів.</p>
         </aside>
     </div>

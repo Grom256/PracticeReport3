@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 
 from apps.catalog.models import Product
 
-from .cart import Cart
+from .cart import MAX_CART_QUANTITY, Cart
 from .forms import CartQuantityForm
 
 
@@ -28,18 +28,21 @@ def cart_add(request, product_id):
         is_active=True,
         category__is_active=True,
     )
-    form = CartQuantityForm(request.POST)
+    cart = Cart(request)
+    current_quantity = cart.quantity_for(product.pk)
+    available_quantity = min(MAX_CART_QUANTITY, product.stock_quantity - current_quantity)
+    if available_quantity < 1:
+        messages.error(request, 'У кошику вже максимальна доступна кількість цього товару.')
+        return redirect('catalog:product_detail', pk=product.pk)
+
+    form = CartQuantityForm(request.POST, max_quantity=available_quantity)
     if not form.is_valid():
         messages.error(request, 'Вкажи коректну кількість товару.')
         return redirect('catalog:product_detail', pk=product.pk)
 
-    cart = Cart(request)
     quantity = form.cleaned_data['quantity']
-    if cart.quantity_for(product.pk) + quantity > product.stock_quantity:
-        messages.error(request, 'У кошик не можна додати більше товару, ніж є на складі.')
-    else:
-        cart.add(product, quantity)
-        messages.success(request, f'«{product.name}» додано до кошика.')
+    cart.add(product, quantity)
+    messages.success(request, f'«{product.name}» додано до кошика.')
     return redirect('catalog:product_detail', pk=product.pk)
 
 
@@ -57,11 +60,9 @@ def cart_update(request, product_id):
         is_active=True,
         category__is_active=True,
     )
-    form = CartQuantityForm(request.POST)
+    form = CartQuantityForm(request.POST, max_quantity=product.stock_quantity)
     if not form.is_valid():
         messages.error(request, 'Вкажи кількість не менше одного.')
-    elif form.cleaned_data['quantity'] > product.stock_quantity:
-        messages.error(request, 'Запитана кількість перевищує залишок на складі.')
     else:
         cart.update(product.pk, form.cleaned_data['quantity'])
         messages.success(request, 'Кількість товару оновлено.')

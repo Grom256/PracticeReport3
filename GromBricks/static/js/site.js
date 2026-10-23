@@ -49,3 +49,5 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!search.contains(event.target) && !input.value.trim()) close();
     });
 });
+
+

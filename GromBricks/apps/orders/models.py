@@ -16,7 +16,7 @@ class Order(models.Model):
         CANCELLED = 'cancelled', 'Скасовано'
 
     class PaymentMethod(models.TextChoices):
-        BANK_TRANSFER = 'bank_transfer', 'Переказ на картку / рахунок'
+        CASH_ON_DELIVERY = 'cash_on_delivery', 'Накладений платіж (оплата при отриманні)'
 
     class DeliveryService(models.TextChoices):
         UKRPOSHTA = 'ukrposhta', 'Укрпошта'
@@ -39,7 +39,8 @@ class Order(models.Model):
         'служба доставки', max_length=12, choices=DeliveryService.choices
     )
     payment_method = models.CharField(
-        'спосіб оплати', max_length=20, choices=PaymentMethod.choices
+        'спосіб оплати', max_length=20, choices=PaymentMethod.choices,
+        default=PaymentMethod.CASH_ON_DELIVERY,
     )
     status = models.CharField(
         'статус', max_length=12, choices=Status.choices, default=Status.PENDING

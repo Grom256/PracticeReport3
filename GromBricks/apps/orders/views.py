@@ -6,9 +6,10 @@ from django.db import transaction
 from django.db.models import DecimalField, ExpressionWrapper, F, Sum, Value
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from apps.catalog.models import Product
-from apps.cart.cart import Cart
+from apps.cart.cart import MAX_CART_QUANTITY, Cart, positive_integer
 from apps.accounts.models import Profile
 
 from .forms import OrderCheckoutForm
@@ -19,12 +20,11 @@ def _cart_quantities(cart):
     """Return validated product ids and quantities from the session cart."""
     quantities = {}
     for product_id, item in cart.items.items():
-        try:
-            quantity = int(item.get('quantity', 0))
-            product_id = int(product_id)
-        except (AttributeError, TypeError, ValueError):
+        quantity = positive_integer(item.get('quantity')) if isinstance(item, dict) else None
+        product_id = positive_integer(product_id)
+        if product_id is None or quantity is None or quantity > MAX_CART_QUANTITY:
             return None
-        if product_id < 1 or quantity < 1:
+        if product_id in quantities:
             return None
         quantities[product_id] = quantity
     return quantities
@@ -34,6 +34,9 @@ def _cart_quantities(cart):
 def checkout(request):
     cart = Cart(request)
     quantities = _cart_quantities(cart)
+    if quantities is None:
+        messages.error(request, 'Перевір кількість товарів у кошику: має бути від 1 до 999 шт. на позицію.')
+        return redirect('cart:detail')
     if not quantities:
         messages.info(request, 'Додай товари до кошика перед оформленням замовлення.')
         return redirect('cart:detail')
@@ -74,9 +77,11 @@ def checkout(request):
 
                 order = form.save(commit=False)
                 order.user = request.user
+                order.payment_method = Order.PaymentMethod.CASH_ON_DELIVERY
                 order.save()
 
                 order_items = []
+                products_to_update = []
                 for product_id, quantity in quantities.items():
                     product = products_by_id[product_id]
                     order_items.append(
@@ -88,9 +93,11 @@ def checkout(request):
                         )
                     )
                     product.stock_quantity -= quantity
-                    product.save(update_fields=('stock_quantity', 'updated_at'))
+                    product.updated_at = timezone.now()
+                    products_to_update.append(product)
 
                 OrderItem.objects.bulk_create(order_items)
+                Product.objects.bulk_update(products_to_update, ('stock_quantity', 'updated_at'))
                 request.session.pop(Cart.session_key, None)
                 request.session.modified = True
 
