@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Список бажань — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width wishlist-page">
+    <div class="page-intro">
+        <p class="eyebrow">GromBricks / Вибране</p>
+        <h1>Мій <span>список бажань</span></h1>
+        <p>Зберігайте мініфігурки та рідкісні деталі, щоб не загубити їх або підписатися на появу в наявності.</p>
+    </div>
+
+    {% if items %}
+        <div class="wishlist-grid">
+            {% for item in items %}
+                <article class="wishlist-card">
+                    <div class="wishlist-card-media">
+                        <a href="{% url 'catalog:product_detail' item.product.pk %}">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" loading="lazy">
+                            {% else %}
+                                <div class="wishlist-placeholder">
+                                    <span class="placeholder-stud"></span>
+                                    <span>GROM<br>BRICKS</span>
+                                </div>
+                            {% endif %}
+                        </a>
+                        {% if item.product.is_rare %}
+                            <span class="product-badge">Рідкісне</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="wishlist-card-content">
+                        <div class="wishlist-meta">
+                            <span>{{ item.product.get_product_type_display }}</span>
+                            <span>{{ item.product.series|default:item.product.category.name }}</span>
+                        </div>
+                        <h3>
+                            <a href="{% url 'catalog:product_detail' item.product.pk %}">{{ item.product.name }}</a>
+                        </h3>
+                        <p class="wishlist-sku">Артикул: {{ item.product.sku }}</p>
+
+                        <div class="wishlist-status-row">
+                            <span class="wishlist-price">{{ item.product.price|floatformat:2 }} ₴</span>
+                            {% if item.product.stock_quantity > 0 %}
+                                <span class="stock-label">В наявності ({{ item.product.stock_quantity }} шт.)</span>
+                            {% else %}
+                                <span class="stock-label stock-none">Немає в наявності</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="wishlist-actions-row">
+                            {% if item.product.stock_quantity > 0 %}
+                                <form method="post" action="{% url 'cart:add' item.product.pk %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-primary button button-gold btn-sm">
+                                        В кошик
+                                    </button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'catalog:product_detail' item.product.pk %}#notify" class="btn btn-secondary button button-outline btn-sm">
+                                    ⚡️ Сповістити
+                                </a>
+                            {% endif %}
+
+                            <form method="post" action="{% url 'catalog:wishlist_toggle' item.product.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{% url 'catalog:wishlist' %}">
+                                <button type="submit" class="wishlist-btn-remove" title="Видалити зі списку">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    <span>Видалити</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <span class="empty-mark">♡</span>
+            <h2>Список бажань порожній</h2>
+            <p>Додавайте товари, натиснувши на іконку серця у каталозі чи на сторінці товару.</p>
+            <a class="btn btn-primary button button-gold" href="{% url 'catalog:product_list' %}">Перейти до каталогу</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

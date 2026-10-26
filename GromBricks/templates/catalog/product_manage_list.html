@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Керування каталогом — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width catalog-page product-manage-page">
+    <div class="page-intro">
+        <p class="eyebrow">GromBricks / Панель менеджера</p>
+        <h1>Керування <span>каталогом</span></h1>
+        <p>Створюй і редагуй товари магазину прямо з сайту або переходь до розширеної адмін-панелі.</p>
+        <div class="manage-intro-actions">
+            <a class="btn btn-primary button button-gold" href="{% url 'catalog:product_create' %}">＋ Додати товар</a>
+            <a class="btn btn-secondary button button-outline" href="/admin/catalog/product/" target="_blank" rel="noopener noreferrer">⚙️ Перейти в Django Admin</a>
+        </div>
+    </div>
+
+    {% if products %}
+        <div class="manage-product-grid">
+            {% for product in products %}
+                <article class="manage-card">
+                    <div class="manage-card-media">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                        {% else %}
+                            <div class="manage-card-placeholder">
+                                <span class="placeholder-stud"></span>
+                                <span>GROM<br>BRICKS</span>
+                            </div>
+                        {% endif %}
+                        <span class="manage-status-badge {% if product.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                            {% if product.is_active %}У каталозі{% else %}Приховано{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="manage-card-body">
+                        <div class="product-meta">
+                            <span>{{ product.get_product_type_display }}</span>
+                            <span>{{ product.category.name }}</span>
+                        </div>
+                        <h3 class="manage-card-title">
+                            <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                        </h3>
+                        <div class="manage-card-info">
+                            <span>Артикул: <strong>{{ product.sku }}</strong></span>
+                            <span>Залишок: <strong>{{ product.stock_quantity }} шт.</strong></span>
+                        </div>
+                        <div class="manage-card-price">
+                            <strong>{{ product.price|floatformat:2 }} ₴</strong>
+                            {% if product.is_rare %}<span class="product-badge badge-rare">Рідкісне</span>{% endif %}
+                        </div>
+                        <div class="manage-card-actions">
+                            <a class="btn btn-secondary manage-btn manage-btn-edit" href="{% url 'catalog:product_update' product.pk %}">Редагувати</a>
+                            <a class="btn btn-secondary manage-btn manage-btn-delete" href="{% url 'catalog:product_delete' product.pk %}">Видалити</a>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h2>Товарів поки немає</h2>
+            <p>Додай перший товар, щоб керувати ним з особистого кабінету.</p>
+            <a class="btn btn-primary button button-gold" href="{% url 'catalog:product_create' %}">Додати товар</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

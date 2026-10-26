@@ -108,3 +108,45 @@ class SessionCartTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse('accounts:login'), response.url)
         self.assertEqual(self.client.session.get('cart', {}), {})
+
+
+class AutomaticDiscountTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='shopper', password='password123')
+        self.category = Category.objects.create(name='Castle', slug='castle')
+        self.product1 = Product.objects.create(
+            category=self.category,
+            product_type=Product.ProductType.MINIFIGURE,
+            sku='CAS-001',
+            name='Лицар',
+            price=Decimal('1000.00'),
+            stock_quantity=10,
+        )
+        self.client.force_login(self.user)
+
+    def test_no_discount_under_or_equal_2500(self):
+        # 2 units = 2000 UAH <= 2500 -> 0%
+        self.client.post(reverse('cart:add', args=[self.product1.pk]), {'quantity': 2})
+        cart = Cart(self.client)
+        self.assertEqual(cart.subtotal, Decimal('2000.00'))
+        self.assertEqual(cart.discount_percent, 0)
+        self.assertEqual(cart.discount_amount, Decimal('0.00'))
+        self.assertEqual(cart.total, Decimal('2000.00'))
+
+    def test_five_percent_discount_over_2500(self):
+        # 3 units = 3000 UAH > 2500 -> 5% discount (150 UAH), total = 2850 UAH
+        self.client.post(reverse('cart:add', args=[self.product1.pk]), {'quantity': 3})
+        cart = Cart(self.client)
+        self.assertEqual(cart.subtotal, Decimal('3000.00'))
+        self.assertEqual(cart.discount_percent, 5)
+        self.assertEqual(cart.discount_amount, Decimal('150.00'))
+        self.assertEqual(cart.total, Decimal('2850.00'))
+
+    def test_ten_percent_discount_over_5000(self):
+        # 6 units = 6000 UAH > 5000 -> 10% discount (600 UAH), total = 5400 UAH
+        self.client.post(reverse('cart:add', args=[self.product1.pk]), {'quantity': 6})
+        cart = Cart(self.client)
+        self.assertEqual(cart.subtotal, Decimal('6000.00'))
+        self.assertEqual(cart.discount_percent, 10)
+        self.assertEqual(cart.discount_amount, Decimal('600.00'))
+        self.assertEqual(cart.total, Decimal('5400.00'))

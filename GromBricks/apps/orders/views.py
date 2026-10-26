@@ -8,9 +8,9 @@ from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from apps.catalog.models import Product
-from apps.cart.cart import MAX_CART_QUANTITY, Cart, positive_integer
 from apps.accounts.models import Profile
+from apps.cart.cart import MAX_CART_QUANTITY, Cart, positive_integer
+from apps.catalog.models import Product
 
 from .forms import OrderCheckoutForm
 from .models import Order, OrderItem
@@ -78,6 +78,10 @@ def checkout(request):
                 order = form.save(commit=False)
                 order.user = request.user
                 order.payment_method = Order.PaymentMethod.CASH_ON_DELIVERY
+                order.subtotal = cart.subtotal
+                order.discount_percent = cart.discount_percent
+                order.discount_amount = cart.discount_amount
+                order.total_amount = cart.total
                 order.save()
 
                 order_items = []
@@ -114,11 +118,18 @@ def checkout(request):
         form = OrderCheckoutForm(initial=initial)
 
     cart_items = list(cart)
-    total = sum((item['line_total'] for item in cart_items), Decimal('0.00'))
     return render(
         request,
         'orders/checkout.html',
-        {'form': form, 'cart_items': cart_items, 'total': total},
+        {
+            'form': form,
+            'cart': cart,
+            'cart_items': cart_items,
+            'subtotal': cart.subtotal,
+            'discount_percent': cart.discount_percent,
+            'discount_amount': cart.discount_amount,
+            'total': cart.total,
+        },
     )
 
 

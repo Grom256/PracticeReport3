@@ -89,6 +89,8 @@ class AccountFlowTests(TestCase):
             reverse('accounts:register'),
             {
                 'username': 'another',
+                'first_name': 'Тест',
+                'last_name': 'Юзер',
                 'email': 'SAME@example.com',
                 'password1': 'Safe-demo-pass-842!',
                 'password2': 'Safe-demo-pass-842!',

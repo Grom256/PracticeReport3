@@ -7,10 +7,10 @@
     <meta name="theme-color" content="#05070d">
     <meta name="description" content="GromBricks — LEGO-мініфігурки та окремі деталі для колекціонерів і майстрів.">
     <title>{% block title %}GromBricks — LEGO для колекціонерів{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20261021-header-icons-2">
+
+
+
+    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20261024-gradients">
     {% block extra_head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
@@ -18,7 +18,7 @@
     <header class="site-header">
         <div class="header-inner page-width">
             <a class="brand" href="{% url 'catalog:home' %}" aria-label="GromBricks — на головну">
-                <span class="brand-mark" aria-hidden="true">G</span>
+                <img class="brand-mark brand-mark-photo" src="{% static 'images/logo.jpg' %}" alt="" aria-hidden="true">
                 <span class="brand-word">GROM<span>BRICKS</span></span>
             </a>
             <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">
@@ -44,7 +44,8 @@
                     <input type="search" name="q" placeholder="Пошук фігурок і деталей" aria-label="Пошук по каталогу" autocomplete="off">
                     <button class="search-toggle" type="submit" aria-label="Пошук"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
                 </form>
-                <a class="header-cart" href="{% url 'cart:detail' %}" aria-label="Кошик, кількість товарів: {{ cart_count }}"><span class="cart-count" aria-hidden="true">{{ cart_count }}</span>{% include 'partials/icon_cart.html' %}</a>
+                <a class="header-wishlist" href="{% url 'catalog:wishlist' %}" aria-label="Список бажань, збережено товарів: {{ wishlist_count }}"><span class="wishlist-count" id="header-wishlist-count" aria-hidden="true">{{ wishlist_count }}</span>{% include 'partials/icon_heart.html' %}</a>
+                <a class="header-cart" href="{% url 'cart:detail' %}" aria-label="Кошик, кількість товарів: {{ cart_count }}"><span class="cart-count" id="header-cart-count" aria-hidden="true">{{ cart_count }}</span>{% include 'partials/icon_cart.html' %}</a>
             </div>
         </div>
     </header>
@@ -55,12 +56,12 @@
     <footer class="site-footer" id="contact">
         <div class="page-width footer-grid">
             <div class="footer-brand-block">
-                <a class="brand" href="{% url 'catalog:home' %}"><span class="brand-mark" aria-hidden="true">G</span><span class="brand-word">GROM<span>BRICKS</span></span></a>
+                <a class="brand" href="{% url 'catalog:home' %}"><img class="brand-mark brand-mark-photo" src="{% static 'images/logo.jpg' %}" alt="" aria-hidden="true"><span class="brand-word">GROM<span>BRICKS</span></span></a>
                 <p>Фігурки та деталі LEGO для колекціонерів і майстрів.</p>
             </div>
             <div class="footer-column"><h3 class="footer-heading">Магазин</h3><a href="{% url 'catalog:product_list' %}">Усі товари</a><a href="{% url 'catalog:home' %}#about">Про магазин</a><a href="{% url 'catalog:home' %}#delivery">Доставка й оплата</a></div>
             <div class="footer-column"><h3 class="footer-heading">Інформація</h3><a href="{% url 'catalog:home' %}#delivery">Доставка й оплата</a><a href="{% url 'catalog:home' %}#about">Про магазин</a><span>Магазин не пов’язаний з LEGO Group.</span></div>
-            <div class="footer-column"><h3 class="footer-heading">Покупки</h3><a href="{% url 'cart:detail' %}">Кошик</a>{% if user.is_authenticated %}<a href="{% url 'orders:list' %}">Мої замовлення</a><a href="{% url 'accounts:profile' %}">Особистий кабінет</a>{% else %}<a href="{% url 'accounts:login' %}">Увійти</a><a href="{% url 'accounts:register' %}">Створити акаунт</a>{% endif %}<a href="{{ telegram_channel_url }}" target="_blank" rel="noopener noreferrer">Telegram</a></div>
+            <div class="footer-column"><h3 class="footer-heading">Покупки</h3><a href="{% url 'cart:detail' %}">Кошик</a><a href="{% url 'catalog:wishlist' %}">Список бажань</a>{% if user.is_authenticated %}<a href="{% url 'orders:list' %}">Мої замовлення</a><a href="{% url 'accounts:profile' %}">Особистий кабінет</a>{% else %}<a href="{% url 'accounts:login' %}">Увійти</a><a href="{% url 'accounts:register' %}">Створити акаунт</a>{% endif %}<a href="{{ telegram_channel_url }}" target="_blank" rel="noopener noreferrer">Telegram</a></div>
         </div>
         <div class="page-width footer-bottom"><span>© GromBricks</span><span>Фігурки та деталі LEGO для колекції й власних збірок.</span></div>
     </footer>

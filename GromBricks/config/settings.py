@@ -80,6 +80,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'apps.cart.context_processors.cart_summary',
                 'apps.accounts.context_processors.store_links',
+                'apps.catalog.context_processors.wishlist_summary',
             ],
         },
     },
@@ -178,3 +179,5 @@ DEFAULT_FROM_EMAIL = os.environ.get(
 )
 
 TELEGRAM_URL = 'https://t.me/grombricks'
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+TELEGRAM_BOT_USERNAME = os.environ.get('TELEGRAM_BOT_USERNAME', 'GromBricksBot')

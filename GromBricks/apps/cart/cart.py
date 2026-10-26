@@ -3,6 +3,10 @@ from decimal import Decimal
 from apps.catalog.models import Product
 
 MAX_CART_QUANTITY = 999
+DISCOUNT_THRESHOLD_TIER1 = Decimal('2500.00')
+DISCOUNT_PERCENT_TIER1 = 5
+DISCOUNT_THRESHOLD_TIER2 = Decimal('5000.00')
+DISCOUNT_PERCENT_TIER2 = 10
 
 
 def positive_integer(value):
@@ -64,8 +68,54 @@ class Cart:
         return total
 
     @property
-    def total(self):
+    def subtotal(self):
+        """Sum of all products before discounts."""
         return sum((item['line_total'] for item in self), Decimal('0.00'))
+
+    @property
+    def discount_percent(self):
+        """Tiered discount: >2500 -> 5%, >5000 -> 10%."""
+        st = self.subtotal
+        if st > DISCOUNT_THRESHOLD_TIER2:
+            return DISCOUNT_PERCENT_TIER2
+        if st > DISCOUNT_THRESHOLD_TIER1:
+            return DISCOUNT_PERCENT_TIER1
+        return 0
+
+    @property
+    def discount_amount(self):
+        """Calculated discount in UAH."""
+        percent = self.discount_percent
+        if not percent:
+            return Decimal('0.00')
+        return (self.subtotal * Decimal(percent) / Decimal('100')).quantize(Decimal('0.01'))
+
+    @property
+    def total(self):
+        """Final total to pay after discount."""
+        return self.subtotal - self.discount_amount
+
+    @property
+    def next_tier(self):
+        """Information on how much UAH is needed to reach the next discount tier."""
+        st = self.subtotal
+        if st <= DISCOUNT_THRESHOLD_TIER1:
+            needed = (DISCOUNT_THRESHOLD_TIER1 + Decimal('0.01')) - st
+            return {
+                'target': DISCOUNT_THRESHOLD_TIER1,
+                'percent': DISCOUNT_PERCENT_TIER1,
+                'needed': needed,
+                'label': f'Додайте ще на {needed:.2f} ₴ для знижки 5%',
+            }
+        if st <= DISCOUNT_THRESHOLD_TIER2:
+            needed = (DISCOUNT_THRESHOLD_TIER2 + Decimal('0.01')) - st
+            return {
+                'target': DISCOUNT_THRESHOLD_TIER2,
+                'percent': DISCOUNT_PERCENT_TIER2,
+                'needed': needed,
+                'label': f'Додайте ще на {needed:.2f} ₴ для максимальної знижки 10%',
+            }
+        return None
 
     def quantity_for(self, product_id):
         parsed_id = positive_integer(product_id)

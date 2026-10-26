@@ -2,28 +2,286 @@
 {% block title %}{{ product.name }} — GromBricks{% endblock %}
 {% block content %}
 <section class="page-width detail-page">
-    <nav class="breadcrumbs" aria-label="Навігаційний шлях"><a href="{% url 'catalog:home' %}">Головна</a><span>/</span><a href="{% url 'catalog:product_list' %}">Каталог</a><span>/</span><span>{{ product.name }}</span></nav>
+    <div class="detail-nav-bar">
+        <nav class="breadcrumbs" aria-label="Навігаційний шлях">
+            <a href="{% url 'catalog:home' %}">Головна</a>
+            <span>/</span>
+            <a href="{% url 'catalog:product_list' %}">Каталог</a>
+            <span>/</span>
+            <a href="{% url 'catalog:product_list' %}?category={{ product.category.slug }}">{{ product.category.name }}</a>
+            <span>/</span>
+            <span>{{ product.name }}</span>
+        </nav>
+        <a class="back-to-catalog-link" href="{% url 'catalog:product_list' %}">
+            <span class="icon-arrow icon-arrow-back">{% include 'partials/icon_arrow.html' %}</span>
+            <span>До каталогу</span>
+        </a>
+    </div>
     <div class="detail-layout">
         <div class="detail-image-wrap">
-            {% if product.image %}<img class="detail-image" src="{{ product.image.url }}" alt="{{ product.name }}">
-            {% else %}<div class="detail-image product-placeholder" aria-label="Фото товару ще не додано"><span class="placeholder-stud"></span><span class="placeholder-label">Фото<br>товару</span></div>{% endif %}
+            {% if product.image %}
+                <img class="detail-image" src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <div class="detail-image product-placeholder" aria-label="Фото товару ще не додано">
+                    <span class="placeholder-stud"></span>
+                    <span class="placeholder-label">GROM<br>BRICKS</span>
+                </div>
+            {% endif %}
             {% if product.is_rare %}<span class="product-badge">Рідкісне</span>{% endif %}
         </div>
         <div class="detail-copy">
-            <p class="eyebrow">{{ product.get_product_type_display }} · {{ product.category.name }}</p><h1>{{ product.name }}</h1><p class="detail-sku">Артикул: {{ product.sku }}</p>
+            <p class="eyebrow">{{ product.get_product_type_display }} · {{ product.category.name }}</p>
+            <h1>{{ product.name }}</h1>
+            <p class="detail-sku">Артикул: {{ product.sku }}</p>
             <p class="detail-price">{{ product.price|floatformat:2 }} <span>₴</span></p>
-            <p class="detail-stock {% if not product.stock_quantity %}stock-none{% endif %}">{% if product.stock_quantity %}Є в наявності: {{ product.stock_quantity }} шт.{% else %}Тимчасово немає в наявності{% endif %}</p>
-            <div class="detail-description">{% if product.description %}{{ product.description|linebreaks }}{% else %}<p>Опис цього товару ще не додано.</p>{% endif %}</div>
-            <dl class="product-specs">{% if product.series %}<div><dt>Серія / тематика</dt><dd>{{ product.series }}</dd></div>{% endif %}{% if product.color %}<div><dt>Колір</dt><dd>{{ product.color }}</dd></div>{% endif %}<div><dt>Стан</dt><dd>{{ product.get_condition_display }}</dd></div><div><dt>Артикул</dt><dd>{{ product.sku }}</dd></div></dl>
-            {% if product.stock_quantity %}
-                {% if user.is_authenticated %}
-                    <form class="add-to-cart-form" method="post" action="{% url 'cart:add' product.id %}">{% csrf_token %}<label for="id_quantity">Кількість</label><input id="id_quantity" type="number" name="quantity" min="1" {% if product.stock_quantity > 999 %}max="999"{% else %}max="{{ product.stock_quantity }}"{% endif %} step="1" inputmode="numeric" value="1" required><button class="btn btn-primary button button-gold" type="submit">Додати до кошика</button></form>
+            <p class="detail-stock {% if not product.stock_quantity %}stock-none{% endif %}">
+                {% if product.stock_quantity %}
+                    Є в наявності: {{ product.stock_quantity }} шт.
                 {% else %}
-                    <p class="detail-note"><a href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Увійди, щоб додати товар до кошика.</a></p>
+                    Тимчасово немає в наявності
                 {% endif %}
+            </p>
+            <div class="detail-description">
+                {% if product.description %}
+                    {{ product.description|linebreaks }}
+                {% else %}
+                    <p>Опис цього товару ще не додано.</p>
+                {% endif %}
+            </div>
+            <dl class="product-specs">
+                {% if product.series %}<div><dt>Серія / тематика</dt><dd>{{ product.series }}</dd></div>{% endif %}
+                {% if product.color %}<div><dt>Колір</dt><dd>{{ product.color }}</dd></div>{% endif %}
+                <div><dt>Стан</dt><dd>{{ product.get_condition_display }}</dd></div>
+                <div><dt>Артикул</dt><dd>{{ product.sku }}</dd></div>
+            </dl>
+
+            <div class="detail-purchase-block">
+                {% if product.stock_quantity %}
+                    {% if user.is_authenticated %}
+                        <form class="add-to-cart-form" method="post" action="{% url 'cart:add' product.id %}">
+                            {% csrf_token %}
+                            <div class="detail-qty-group">
+                                <label for="id_quantity">Кількість</label>
+                                <input id="id_quantity" class="detail-qty-input" type="number" name="quantity" min="1" {% if product.stock_quantity > 999 %}max="999"{% else %}max="{{ product.stock_quantity }}"{% endif %} step="1" inputmode="numeric" value="1" required>
+                            </div>
+                            <button class="detail-btn-cart" type="submit">
+                                {% include 'partials/icon_cart.html' %}
+                                <span>Додати до кошика</span>
+                            </button>
+                        </form>
+                    {% else %}
+                        <p class="detail-note"><a href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Увійдіть, щоб додати товар до кошика.</a></p>
+                    {% endif %}
+                {% endif %}
+
+                <!-- Wishlist Toggle Button (works for both in-stock and out-of-stock items) -->
+                <div class="detail-wishlist-action">
+                    {% if user.is_authenticated %}
+                        <form class="js-wishlist-form" method="post" action="{% url 'catalog:wishlist_toggle' product.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <button type="submit" class="wishlist-detail-btn {% if is_in_wishlist %}is-active{% endif %}">
+                                <span class="wishlist-icon">{% include 'partials/icon_heart.html' %}</span>
+                                <span>{% if is_in_wishlist %}У списку бажань{% else %}Додати в обране{% endif %}</span>
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="wishlist-detail-btn">
+                            <span class="wishlist-icon">{% include 'partials/icon_heart.html' %}</span>
+                            <span>Додати в обране</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Out-of-stock Notification Card -->
+            {% if product.stock_quantity == 0 %}
+                <div class="stock-notify-panel">
+                    <div class="stock-notify-header">
+                        <span class="notify-icon" aria-hidden="true">⚡️</span>
+                        <div>
+                            <h3>Повідомити про наявність</h3>
+                            <p>Отримайте сповіщення на Email або у Telegram, щойно товар з’явиться у магазині!</p>
+                        </div>
+                    </div>
+
+                    {% if has_stock_subscription %}
+                        <div class="alert-success-box">
+                            <strong>✓ Ви вже підписані на сповіщення про цей товар.</strong>
+                            <p>Ми надішлемо вам повідомлення одразу після поповнення складу.</p>
+                        </div>
+                    {% endif %}
+
+                    <form class="stock-notify-form site-form" method="post" action="{% url 'catalog:stock_notify' product.pk %}">
+                        {% csrf_token %}
+                        <div class="channel-picker">
+                            <span class="channel-label">Канал сповіщення:</span>
+                            <div class="channel-options">
+                                <label class="channel-option">
+                                    <input type="radio" name="channel" value="email" checked onchange="toggleNotifyChannels()">
+                                    <span>Пошта (Email)</span>
+                                </label>
+                                <label class="channel-option">
+                                    <input type="radio" name="channel" value="telegram" onchange="toggleNotifyChannels()">
+                                    <span>Telegram</span>
+                                </label>
+                                <label class="channel-option">
+                                    <input type="radio" name="channel" value="both" onchange="toggleNotifyChannels()">
+                                    <span>Email + Telegram</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group notify-field" id="field-email-group">
+                            <label for="id_notify_email">Електронна пошта</label>
+                            <input id="id_notify_email" type="email" name="email" class="form-input" value="{{ notification_form.initial.email|default:'' }}" placeholder="name@example.com">
+                        </div>
+
+                        <div class="form-group notify-field" id="field-telegram-group" style="display: none;">
+                            <label for="id_notify_telegram">Telegram Chat ID</label>
+                            <div class="telegram-input-row">
+                                <input id="id_notify_telegram" type="text" name="telegram_chat_id" class="form-input" value="{{ notification_form.initial.telegram_chat_id|default:'' }}" placeholder="Наприклад: 123456789">
+                                {% if user.is_authenticated %}
+                                    <button type="button" class="btn btn-secondary button button-outline btn-sm js-sync-telegram-btn" title="Автоматично визначити Chat ID, якщо ви написали боту /start">
+                                        ⚡️ Визначити Chat ID
+                                    </button>
+                                {% endif %}
+                            </div>
+                            <div class="telegram-bot-hint">
+                                <span>Бот сповіщень: </span>
+                                <a href="https://t.me/{{ bot_username }}?start=notify_{{ product.pk }}" target="_blank" rel="noopener noreferrer" class="bot-link">
+                                    @{{ bot_username }} {% include 'partials/icon_arrow.html' %}
+                                </a>
+                                <p class="small-text">Натисніть на посилання бота, натисніть <b>«Start»</b> у Telegram, потім натисніть <i>«Визначити Chat ID»</i> або вкажіть ваш ID.</p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary button button-gold notify-submit-btn">
+                            Підписатися на сповіщення
+                        </button>
+                    </form>
+                </div>
             {% endif %}
-            <a class="btn btn-secondary button button-outline" href="{% url 'catalog:product_list' %}">{% include 'partials/icon_arrow.html' %} Повернутися до каталогу</a>
+
+            <div class="detail-guarantees">
+                <div class="guarantee-item">
+                    <span class="guarantee-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L3 7v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V7l-9-5z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <strong>100% оригінальний LEGO</strong>
+                        <p>Усі деталі автентичні, перевірені на відсутність тріщин та сколів.</p>
+                    </div>
+                </div>
+                <div class="guarantee-item">
+                    <span class="guarantee-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="3" width="15" height="13"/>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                            <circle cx="5.5" cy="18.5" r="2.5"/>
+                            <circle cx="18.5" cy="18.5" r="2.5"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <strong>Швидка доставка по Україні</strong>
+                        <p>Нова Пошта, Укрпошта або Meest. Надійне пакування в захисні бокси.</p>
+                    </div>
+                </div>
+                <div class="guarantee-item">
+                    <span class="guarantee-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="5" width="20" height="14" rx="2"/>
+                            <line x1="2" y1="10" x2="22" y2="10"/>
+                            <circle cx="7" cy="15" r="1.5"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <strong>Оплата при отриманні</strong>
+                        <p>Накладений платіж. Спершу оглядаєте посилку у відділенні, потім сплачуєте.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    {% if related_products %}
+    <div class="related-section">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Колекція / Схожі позиції</p>
+                <h2>Вам також може сподобатися</h2>
+            </div>
+            <a class="text-link" href="{% url 'catalog:product_list' %}?category={{ product.category.slug }}">
+                Усі позиції серії {% include 'partials/icon_arrow.html' %}
+            </a>
+        </div>
+        <div class="product-grid">
+            {% for item in related_products %}
+                {% include 'catalog/partials/product_card.html' with product=item %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </section>
+
+<script>
+function toggleNotifyChannels() {
+    const radios = document.querySelectorAll('input[name="channel"]');
+    let selected = 'email';
+    radios.forEach(r => { if (r.checked) selected = r.value; });
+
+    const emailGroup = document.getElementById('field-email-group');
+    const tgGroup = document.getElementById('field-telegram-group');
+
+    if (emailGroup && tgGroup) {
+        if (selected === 'email') {
+            emailGroup.style.display = 'block';
+            tgGroup.style.display = 'none';
+        } else if (selected === 'telegram') {
+            emailGroup.style.display = 'none';
+            tgGroup.style.display = 'block';
+        } else {
+            emailGroup.style.display = 'block';
+            tgGroup.style.display = 'block';
+        }
+    }
+}
+document.addEventListener('DOMContentLoaded', function() {
+    toggleNotifyChannels();
+    const syncBtn = document.querySelector('.js-sync-telegram-btn');
+    if (syncBtn) {
+        syncBtn.addEventListener('click', function() {
+            syncBtn.disabled = true;
+            syncBtn.textContent = 'Перевірка...';
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            fetch('{% url "catalog:telegram_sync" %}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken,
+                },
+            })
+            .then(res => res.json())
+            .then(data => {
+                syncBtn.disabled = false;
+                syncBtn.textContent = '⚡️ Визначити Chat ID';
+                if (data.status === 'ok') {
+                    document.getElementById('id_notify_telegram').value = data.chat_id;
+                    alert(data.message);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(err => {
+                syncBtn.disabled = false;
+                syncBtn.textContent = '⚡️ Визначити Chat ID';
+                alert('Помилка з’єднання або бот ще не отримав повідомлення. Відкрийте бота @{{ bot_username }} і натисніть /start.');
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

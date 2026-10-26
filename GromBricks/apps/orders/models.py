@@ -45,6 +45,16 @@ class Order(models.Model):
     status = models.CharField(
         'статус', max_length=12, choices=Status.choices, default=Status.PENDING
     )
+    subtotal = models.DecimalField(
+        'сума товарів без знижки', max_digits=10, decimal_places=2, default=Decimal('0.00')
+    )
+    discount_percent = models.PositiveSmallIntegerField('відсоток знижки', default=0)
+    discount_amount = models.DecimalField(
+        'сума знижки', max_digits=10, decimal_places=2, default=Decimal('0.00')
+    )
+    total_amount = models.DecimalField(
+        'підсумок до оплати', max_digits=10, decimal_places=2, default=Decimal('0.00')
+    )
     created_at = models.DateTimeField('створено', auto_now_add=True)
     updated_at = models.DateTimeField('оновлено', auto_now=True)
 
@@ -56,8 +66,7 @@ class Order(models.Model):
     def __str__(self):
         return f'Замовлення №{self.pk}'
 
-    @property
-    def total_amount(self):
+    def calculate_items_total(self):
         total = self.items.aggregate(
             total=Sum(
                 ExpressionWrapper(

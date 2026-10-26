@@ -1,14 +1,81 @@
-<article class="product-card">
-    <a class="product-image-link" href="{% url 'catalog:product_detail' product.pk %}" aria-label="Переглянути {{ product.name }}">
-        {% if product.image %}<img class="product-image" src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
-        {% else %}<span class="product-image product-placeholder" aria-hidden="true"><span class="placeholder-stud"></span><span class="placeholder-label">GROM<br>BRICKS</span></span>{% endif %}
-        {% if product.is_rare %}<span class="product-badge">Рідкісне</span>{% endif %}
-    </a>
+{% load catalog_tags %}
+<article class="product-card js-product-card" data-url="{% url 'catalog:product_detail' product.pk %}">
+    <a class="card-link-overlay" href="{% url 'catalog:product_detail' product.pk %}" aria-label="Переглянути {{ product.name }}"></a>
+
+    <div class="product-card-media">
+        {% if product.image %}
+            <img class="product-image" src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+        {% else %}
+            <span class="product-image product-placeholder" aria-hidden="true">
+                <span class="placeholder-stud"></span>
+                <span class="placeholder-label">GROM<br>BRICKS</span>
+            </span>
+        {% endif %}
+
+        <div class="card-badges-top">
+            {% if product.is_rare %}
+                <span class="product-badge badge-rare">Рідкісне</span>
+            {% endif %}
+            <span class="stock-badge {% if product.stock_quantity > 0 %}stock-badge-in{% else %}stock-badge-out{% endif %}">
+                <span class="stock-dot"></span>
+                {% stock_status product %}
+            </span>
+        </div>
+    </div>
+
     <div class="product-card-body">
-        <div class="product-meta"><span>{{ product.get_product_type_display }}</span><span>{{ product.get_condition_display }}</span></div>
-        <h3><a href="{% url 'catalog:product_detail' product.pk %}">{{ product.name }}</a></h3>
-        <p class="product-series">{% if product.series %}{{ product.series }}{% else %}{{ product.category.name }}{% endif %}</p>
-        <div class="product-card-bottom"><strong>{{ product.price|floatformat:2 }} <small>₴</small></strong>{% if product.stock_quantity > 0 %}<span class="stock-label">В наявності</span>{% else %}<span class="stock-label stock-none">Немає</span>{% endif %}</div>
-        <a class="product-open-link" href="{% url 'catalog:product_detail' product.pk %}">Детальніше {% include 'partials/icon_arrow.html' %}</a>
+        <div class="product-meta">
+            <span>{{ product.get_product_type_display }}</span>
+            <span>{{ product.series|default:product.category.name }}</span>
+        </div>
+
+        <h3 class="product-title">
+            <a href="{% url 'catalog:product_detail' product.pk %}" class="product-title-link">{{ product.name }}</a>
+        </h3>
+
+        <div class="product-price-row">
+            <span class="product-price">{{ product.price|floatformat:2 }} <small>₴</small></span>
+            <span class="product-condition-pill">{{ product.get_condition_display }}</span>
+        </div>
+
+        <div class="product-card-actions">
+            {% if product.stock_quantity > 0 %}
+                {% if user.is_authenticated %}
+                    <form class="card-action-form js-card-cart-form" method="post" action="{% url 'cart:add' product.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" value="1">
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <button type="submit" class="card-btn-cart" title="Додати до кошика">
+                            {% include 'partials/icon_cart.html' %}
+                            <span>В кошик</span>
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="card-btn-cart" title="Увійдіть, щоб купити">
+                        {% include 'partials/icon_cart.html' %}
+                        <span>В кошик</span>
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'catalog:product_detail' product.pk %}#field-email-group" class="card-btn-notify" title="Підписатися на появу в наявності">
+                    <span class="notify-flash">⚡️</span>
+                    <span>Сповістити</span>
+                </a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <form class="card-wishlist-form js-wishlist-form" method="post" action="{% url 'catalog:wishlist_toggle' product.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button type="submit" class="card-btn-wishlist {% if product.id in wishlist_product_ids %}is-active{% endif %}" aria-label="{% if product.id in wishlist_product_ids %}Видалити зі списку бажань{% else %}Додати до списку бажань{% endif %}" title="{% if product.id in wishlist_product_ids %}У списку бажань{% else %}Додати до списку бажань{% endif %}">
+                        {% include 'partials/icon_heart.html' %}
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="card-btn-wishlist" aria-label="Увійдіть, щоб зберегти" title="Увійдіть, щоб зберегти">
+                    {% include 'partials/icon_heart.html' %}
+                </a>
+            {% endif %}
+        </div>
     </div>
 </article>

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Підтвердження пошти — GromBricks{% endblock %}
+{% block body_class %}page-auth page-auth-verify{% endblock %}
+{% block content %}
+<section class="form-page auth-form-page">
+    {% include 'partials/auth_lightning.html' %}
+    <div class="form-panel">
+        <p class="eyebrow">GromBricks / Безпека</p>
+        <h1>Підтвердити <span>пошту</span></h1>
+        <p class="form-intro">
+            Ми надіслали 6-значний код підтвердження на пошту <strong>{{ user_email }}</strong>.
+            Введіть його нижче, щоб завершити реєстрацію та активувати акаунт.
+        </p>
+        <form method="post" class="site-form">
+            {% csrf_token %}
+            {% include 'accounts/partials/form_fields.html' %}
+            <button class="btn btn-primary button button-gold" type="submit">Підтвердити код</button>
+        </form>
+        <form method="post" action="{% url 'accounts:resend_code' %}" class="resend-form" style="margin-top: 1.5rem;">
+            {% csrf_token %}
+            <p class="form-footnote">Не отримали листа? <button type="submit" class="text-link" style="background: none; border: none; padding: 0; cursor: pointer; color: inherit; text-decoration: underline;">Надіслати новий код</button></p>
+        </form>
+    </div>
+</section>
+{% endblock %}

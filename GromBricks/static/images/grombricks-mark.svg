@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Емблема GromBricks</title>
+  <defs>
+    <linearGradient id="gold" x1="18" y1="16" x2="110" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF4A8"/>
+      <stop offset=".26" stop-color="#F7D45D"/>
+      <stop offset=".56" stop-color="#C88922"/>
+      <stop offset=".77" stop-color="#FFE98A"/>
+      <stop offset="1" stop-color="#9D5B12"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="42" y1="18" x2="88" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF8BE"/>
+      <stop offset=".42" stop-color="#E8B943"/>
+      <stop offset=".72" stop-color="#8F4E0E"/>
+      <stop offset="1" stop-color="#FFE477"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <path d="M61 12C34 14 14 36 14 64c0 23 14 43 34 51l7-16C41 94 31 81 31 64c0-18 12-33 28-37l7-15C64 12 63 12 61 12Zm25 7-39 54h26l-8 38 43-56H81l13-36h-8Z" fill="url(#gold)" stroke="#FFF2A1" stroke-width="2" stroke-linejoin="round" filter="url(#glow)"/>
+  <path d="M86 19 47 73h26l-8 38 43-56H81l13-36h-8Z" fill="url(#bolt)" stroke="#FFEFA1" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M35 64c0-15 9-28 22-34" stroke="#FFF6B0" stroke-width="3" stroke-linecap="round" opacity=".72"/>
+</svg>

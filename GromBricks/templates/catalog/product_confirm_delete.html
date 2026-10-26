@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Видалити товар — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width form-page">
+    <div class="form-panel">
+        <p class="eyebrow">GromBricks / Керування товарами</p>
+        <h1>Видалити <span>товар?</span></h1>
+        <p class="form-intro">Товар «{{ object.name }}» буде видалено з каталогу. Цю дію не можна скасувати.</p>
+        <form method="post" class="site-form">
+            {% csrf_token %}
+            <button class="btn btn-primary button button-gold" type="submit">Так, видалити</button>
+            <a class="btn btn-secondary button button-outline" href="{% url 'catalog:product_manage_list' %}">Скасувати</a>
+        </form>
+    </div>
+</section>
+{% endblock %}

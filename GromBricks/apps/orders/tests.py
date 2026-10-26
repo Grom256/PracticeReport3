@@ -87,3 +87,25 @@ class OrderFlowTests(TestCase):
             self.client.get(reverse('orders:detail', args=[order.pk])).status_code,
             404,
         )
+
+
+    def test_checkout_applies_tiered_discount(self):
+        expensive_product = Product.objects.create(
+            category=self.category,
+            product_type=Product.ProductType.MINIFIGURE,
+            sku='EXP-001',
+            name='Колекційний набір',
+            condition=Product.Condition.NEW,
+            price=Decimal('3000.00'),
+            stock_quantity=5,
+        )
+        self.client.post(reverse('cart:remove', args=[self.product.pk]))
+        self.client.post(reverse('cart:add', args=[expensive_product.pk]), {'quantity': 2})
+        # 2 * 3000 = 6000 UAH > 5000 -> 10% discount (600 UAH), total = 5400 UAH
+
+        response = self.client.post(reverse('orders:checkout'), self.checkout_data)
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(order.subtotal, Decimal('6000.00'))
+        self.assertEqual(order.discount_percent, 10)
+        self.assertEqual(order.discount_amount, Decimal('600.00'))
+        self.assertEqual(order.total_amount, Decimal('5400.00'))

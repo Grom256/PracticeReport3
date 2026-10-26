@@ -1,24 +1,183 @@
 {% extends 'base.html' %}
 {% block title %}Мій профіль — GromBricks{% endblock %}
+{% block body_class %}page-profile{% endblock %}
 {% block content %}
-<section class="page-width form-page">
-    <div class="form-panel">
+<section class="page-width profile-page">
+    <div class="page-intro">
         <p class="eyebrow">GromBricks / Особистий кабінет</p>
         <h1>Мій <span>профіль</span></h1>
-        <p class="form-intro">
-            Логін: <strong>{{ request.user.username }}</strong>
-            {% if profile.is_email_verified %}
-                <span class="badge-verified" style="display: inline-block; margin-left: 0.5rem; padding: 0.2rem 0.6rem; font-size: 0.8rem; border-radius: 4px; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3);">✓ Пошта підтверджена</span>
-            {% endif %}
-        </p>
-        <form method="post" class="site-form">
-            {% csrf_token %}
-            {% include 'accounts/partials/form_fields.html' %}
-            <button class="btn btn-primary button button-gold" type="submit">Зберегти зміни</button>
-        </form>
-        <a class="text-link profile-orders-link" href="{% url 'cart:detail' %}">Перейти до кошика {% include 'partials/icon_arrow.html' %}</a>
-        <a class="text-link profile-orders-link" href="{% url 'orders:list' %}">Історія замовлень {% include 'partials/icon_arrow.html' %}</a>
-        {% if request.user.is_staff %}<a class="text-link profile-orders-link" href="{% url 'catalog:product_manage_list' %}">Керування каталогом</a>{% endif %}
+        <p>Керуйте персональними даними, переглядайте історію покупок та статус замовлень.</p>
+    </div>
+
+    <div class="profile-layout">
+        <!-- Left: Personal Data Form -->
+        <div class="profile-card profile-main-card">
+            <div class="profile-header-meta">
+                <div class="profile-avatar">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="{{ request.user.username }}">
+                    {% else %}
+                        <span>{{ request.user.username|first|upper }}</span>
+                    {% endif %}
+                </div>
+                <div class="profile-user-info">
+                    <h2>{{ request.user.get_full_name|default:request.user.username }}</h2>
+                    <p class="profile-username">@{{ request.user.username }}</p>
+                    <div class="profile-badges">
+                        {% if profile.is_email_verified %}
+                            <span class="badge-verified">✓ Пошта підтверджена</span>
+                        {% else %}
+                            <span class="badge-unverified">Пошта не підтверджена</span>
+                        {% endif %}
+                        {% if profile.telegram_chat_id %}
+                            <span class="badge-verified">✓ Telegram прив'язано</span>
+                        {% endif %}
+                        {% if request.user.is_staff %}
+                            <span class="badge-staff">Staff / Адміністратор</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="site-form profile-form">
+                {% csrf_token %}
+                {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+                {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+                {% for field in form.visible_fields %}
+                    {% if field.name == 'avatar' %}
+                        <div class="form-field">
+                            <label>{{ field.label }}</label>
+                            <div class="avatar-upload-wrapper">
+                                <div class="avatar-upload-preview">
+                                    {% if profile.avatar %}
+                                        <img src="{{ profile.avatar.url }}" alt="Аватар" id="avatar-preview-img">
+                                    {% else %}
+                                        <span class="avatar-placeholder" id="avatar-preview-placeholder">{{ request.user.username|first|upper }}</span>
+                                        <img src="" alt="Аватар" id="avatar-preview-img" style="display:none">
+                                    {% endif %}
+                                </div>
+                                <div class="avatar-upload-controls">
+                                    <label class="avatar-file-label" for="id_avatar">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                        Обрати файл
+                                    </label>
+                                    <input type="file" name="avatar" id="id_avatar" accept="image/*">
+                                    <span class="avatar-file-name" id="avatar-file-name">
+                                        {% if profile.avatar %}{{ profile.avatar.name|cut:"avatars/" }}{% else %}Файл не обрано{% endif %}
+                                    </span>
+                                    {% if profile.avatar %}
+                                        <label class="avatar-clear-label">
+                                            <input type="checkbox" name="avatar-clear" id="avatar-clear">
+                                            Видалити аватар
+                                        </label>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="form-field">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}
+                            {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <button class="btn btn-primary button button-gold" type="submit">Зберегти зміни</button>
+            </form>
+        </div>
+
+        <!-- Right: Fast Actions & Recent Orders -->
+        <div class="profile-aside">
+            <!-- Quick Actions -->
+            <div class="profile-card profile-actions-card">
+                <h3>Швидкі розділи</h3>
+                <div class="profile-links-list">
+                    <a class="profile-action-link" href="{% url 'cart:detail' %}">
+                        <span class="action-icon">{% include 'partials/icon_cart.html' %}</span>
+                        <span class="action-text">Мій кошик <small>Товарів: {{ cart_count }}</small></span>
+                        <span class="action-arrow">{% include 'partials/icon_arrow.html' %}</span>
+                    </a>
+                    <a class="profile-action-link" href="{% url 'catalog:wishlist' %}">
+                        <span class="action-icon">{% include 'partials/icon_heart.html' %}</span>
+                        <span class="action-text">Список бажань <small>Збережено: {{ wishlist_count }}</small></span>
+                        <span class="action-arrow">{% include 'partials/icon_arrow.html' %}</span>
+                    </a>
+                    <a class="profile-action-link" href="{% url 'orders:list' %}">
+                        <span class="action-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        </span>
+                        <span class="action-text">Всі замовлення <small>Всього: {{ total_orders }}</small></span>
+                        <span class="action-arrow">{% include 'partials/icon_arrow.html' %}</span>
+                    </a>
+                    {% if request.user.is_staff %}
+                        <a class="profile-action-link profile-action-staff" href="{% url 'catalog:product_manage_list' %}">
+                            <span class="action-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            </span>
+                            <span class="action-text">Керування каталогом <small>Панель товарів</small></span>
+                            <span class="action-arrow">{% include 'partials/icon_arrow.html' %}</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Telegram Connection Card -->
+            <div class="profile-card profile-telegram-card">
+                <h3>⚡️ Сповіщення в Telegram</h3>
+                {% if profile.telegram_chat_id %}
+                    <p class="profile-telegram-status status-connected">
+                        ✓ Telegram підключено. Chat ID: <code>{{ profile.telegram_chat_id }}</code>
+                    </p>
+                    <p class="small-text">Ви отримуватимете миттєві сповіщення від бота <a href="https://t.me/GromBricksBot" target="_blank" rel="noopener noreferrer">@GromBricksBot</a> про появу товарів.</p>
+                {% else %}
+                    <p class="small-text">Підключіть Telegram, щоб миттєво дізнаватися про надходження рідкісних LEGO-фігурок:</p>
+                    <ol class="telegram-steps">
+                        <li>Відкрийте бота <a href="https://t.me/GromBricksBot?start=user_{{ request.user.pk }}" target="_blank" rel="noopener noreferrer">@GromBricksBot</a></li>
+                        <li>Натисніть <b>«Start»</b></li>
+                        <li>Натисніть кнопку синхронізації нижче:</li>
+                    </ol>
+                    <form method="post" action="{% url 'catalog:telegram_sync' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary button button-outline btn-sm">
+                            ⚡️ Синхронізувати з @GromBricksBot
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="profile-card profile-orders-card">
+                <div class="card-header-flex">
+                    <h3>Останні замовлення</h3>
+                    {% if total_orders > 0 %}
+                        <a class="text-link" href="{% url 'orders:list' %}">Всі ({{ total_orders }})</a>
+                    {% endif %}
+                </div>
+
+                {% if recent_orders %}
+                    <div class="profile-recent-orders">
+                        {% for order in recent_orders %}
+                            <a class="order-card profile-order-item" href="{% url 'orders:detail' order.pk %}">
+                                <div class="order-main-info">
+                                    <strong>№{{ order.pk }}</strong>
+                                    <small>{{ order.created_at|date:'d.m.Y' }}</small>
+                                </div>
+                                <span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span>
+                                <span class="order-card-total">{{ order.total_amount|default:order.calculate_items_total|floatformat:2 }} ₴</span>
+                                <span class="order-card-arrow" aria-hidden="true">{% include 'partials/icon_arrow.html' %}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="profile-empty-orders">
+                        <p>У вас ще немає оформлених замовлень.</p>
+                        <a class="text-link" href="{% url 'catalog:product_list' %}">Переглянути каталог {% include 'partials/icon_arrow.html' %}</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}

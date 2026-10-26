@@ -8,9 +8,27 @@
         <div class="checkout-panel">
             <h2>Склад замовлення</h2>
             <div class="order-items-list">
-                {% for item in order.items.all %}<div class="order-item-row"><a href="{% url 'catalog:product_detail' item.product_id %}">{{ item.product.name }}</a><span>{{ item.quantity }} × {{ item.unit_price|floatformat:2 }} ₴</span><strong>{{ item.line_total|floatformat:2 }} ₴</strong></div>{% endfor %}
+                {% for item in order.items.all %}
+                    <div class="order-item-row">
+                        <a href="{% url 'catalog:product_detail' item.product_id %}">{{ item.product.name }}</a>
+                        <span>{{ item.quantity }} × {{ item.unit_price|floatformat:2 }} ₴</span>
+                        <strong>{{ item.line_total|floatformat:2 }} ₴</strong>
+                    </div>
+                {% endfor %}
             </div>
-            <div class="checkout-total"><span>Разом за товари</span><strong>{{ order.total_amount|floatformat:2 }} ₴</strong></div>
+            <div class="order-calc-breakdown">
+                {% if order.discount_percent > 0 %}
+                    <div class="order-calc-line">
+                        <span>Вартість товарів:</span>
+                        <span>{{ order.subtotal|floatformat:2 }} ₴</span>
+                    </div>
+                    <div class="order-calc-line order-discount-line">
+                        <span>Автоматична знижка ({{ order.discount_percent }}%):</span>
+                        <strong class="discount-negative">-{{ order.discount_amount|floatformat:2 }} ₴</strong>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="checkout-total"><span>Разом до оплати</span><strong>{{ order.total_amount|default:order.calculate_items_total|floatformat:2 }} ₴</strong></div>
         </div>
         <aside class="order-info-panel">
             <h2>Доставка й оплата</h2>

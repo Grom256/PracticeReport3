@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}{% if object %}Редагувати товар{% else %}Новий товар{% endif %} — GromBricks{% endblock %}
+{% block content %}
+<section class="page-width form-page">
+    <div class="form-panel">
+        <p class="eyebrow">GromBricks / Керування товарами</p>
+        <h1>{% if object %}Редагувати <span>товар</span>{% else %}Додати <span>товар</span>{% endif %}</h1>
+        <form method="post" enctype="multipart/form-data" class="site-form">
+            {% csrf_token %}
+            {% include 'accounts/partials/form_fields.html' %}
+            <button class="btn btn-primary button button-gold" type="submit">Зберегти товар</button>
+            <a class="btn btn-secondary button button-outline" href="{% url 'catalog:product_manage_list' %}">Скасувати</a>
+        </form>
+    </div>
+</section>
+{% endblock %}

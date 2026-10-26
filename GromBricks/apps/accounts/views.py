@@ -157,11 +157,26 @@ def account_logout(request):
 @login_required
 def profile(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
-    form = ProfileForm(request.POST or None, instance=profile)
+    form = ProfileForm(request.POST or None, request.FILES or None, instance=profile)
     if request.method == 'POST' and form.is_valid():
         with transaction.atomic():
             form.save()
         messages.success(request, 'Дані профілю оновлено.')
         return redirect('accounts:profile')
 
-    return render(request, 'accounts/profile.html', {'form': form, 'profile': profile})
+    recent_orders = (
+        request.user.orders.prefetch_related('items__product')
+        .order_by('-created_at')[:4]
+    )
+    total_orders = request.user.orders.count()
+
+    return render(
+        request,
+        'accounts/profile.html',
+        {
+            'form': form,
+            'profile': profile,
+            'recent_orders': recent_orders,
+            'total_orders': total_orders,
+        },
+    )

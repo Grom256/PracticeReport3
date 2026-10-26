@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from .models import Profile
 
@@ -9,8 +9,8 @@ User = get_user_model()
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(label='Електронна пошта')
-    first_name = forms.CharField(label="Ім’я", max_length=150, required=False)
-    last_name = forms.CharField(label='Прізвище', max_length=150, required=False)
+    first_name = forms.CharField(label="Ім’я", max_length=150, required=True)
+    last_name = forms.CharField(label='Прізвище', max_length=150, required=True)
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -34,20 +34,23 @@ class LoginForm(AuthenticationForm):
 
 
 class ProfileForm(forms.ModelForm):
-    first_name = forms.CharField(label="Ім’я", max_length=150, required=False)
-    last_name = forms.CharField(label='Прізвище', max_length=150, required=False)
-    email = forms.EmailField(label='Електронна пошта', required=False)
+    first_name = forms.CharField(label="Ім’я", max_length=150, required=True)
+    last_name = forms.CharField(label='Прізвище', max_length=150, required=True)
+    email = forms.EmailField(label='Електронна пошта', required=True)
 
     class Meta:
         model = Profile
-        fields = ('phone', 'avatar_url', 'date_of_birth')
+        fields = ('phone', 'avatar', 'date_of_birth', 'telegram_chat_id')
         labels = {
             'phone': 'Телефон',
-            'avatar_url': 'Посилання на аватар',
+            'avatar': 'Аватар',
             'date_of_birth': 'Дата народження',
+            'telegram_chat_id': 'Telegram Chat ID (для сповіщень)',
         }
         widgets = {
+            'avatar': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'telegram_chat_id': forms.TextInput(attrs={'placeholder': 'Наприклад: 123456789 або натисніть /start у боті'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -74,9 +77,10 @@ class ProfileForm(forms.ModelForm):
             user.save(update_fields=('first_name', 'last_name', 'email'))
         return profile
 
+
 class EmailVerificationForm(forms.Form):
     code = forms.CharField(
-        label='??? ????????????? ? ?????',
+        label='Код підтвердження з листа',
         max_length=6,
         min_length=6,
         widget=forms.TextInput(
@@ -93,6 +97,5 @@ class EmailVerificationForm(forms.Form):
     def clean_code(self):
         code = self.cleaned_data['code'].strip()
         if not code.isdigit() or len(code) != 6:
-            raise forms.ValidationError('??? ??? ?????????? ????? ? 6 ????.')
+            raise forms.ValidationError('Код має складатися рівно з 6 цифр.')
         return code
-

@@ -16,9 +16,26 @@
         <aside class="checkout-summary" aria-label="Підсумок кошика">
             <h2>Твоє замовлення</h2>
             <ul class="checkout-items">
-                {% for item in cart_items %}<li><span>{{ item.product.name }} <small>× {{ item.quantity }}</small></span><strong>{{ item.line_total|floatformat:2 }} ₴</strong></li>{% endfor %}
+                {% for item in cart_items %}
+                    <li>
+                        <span>{{ item.product.name }} <small>× {{ item.quantity }}</small></span>
+                        <strong>{{ item.line_total|floatformat:2 }} ₴</strong>
+                    </li>
+                {% endfor %}
             </ul>
-            <div class="checkout-total"><span>Разом за товари</span><strong>{{ total|floatformat:2 }} ₴</strong></div>
+            <div class="checkout-calc">
+                <div class="checkout-calc-line">
+                    <span>Товари:</span>
+                    <span>{{ subtotal|floatformat:2 }} ₴</span>
+                </div>
+                {% if discount_percent > 0 %}
+                    <div class="checkout-calc-line checkout-discount-line">
+                        <span>Автоматична знижка ({{ discount_percent }}%):</span>
+                        <strong class="discount-negative">-{{ discount_amount|floatformat:2 }} ₴</strong>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="checkout-total"><span>Разом до оплати:</span><strong>{{ total|floatformat:2 }} ₴</strong></div>
             <p class="checkout-payment-summary">Оплата: накладений платіж (при отриманні).</p>
             <p>Вартість доставки не включена в суму товарів.</p>
         </aside>
