@@ -7,3 +7,5 @@ venv/
 staticfiles/
 media/products/
 .idea/
+# Aiven SSL certificate — add manually on server, never commit
+ca.pem

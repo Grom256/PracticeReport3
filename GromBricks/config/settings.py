@@ -40,6 +40,13 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# CSRF trusted origins for Render and custom domains
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost').split(',')
+    if origin.strip()
+]
+
 
 # Application definition
 
@@ -113,7 +120,11 @@ DATABASES = {
         'PASSWORD': mysql_config['MYSQL_PASSWORD'],
         'HOST': os.environ.get('MYSQL_HOST') or '127.0.0.1',
         'PORT': os.environ.get('MYSQL_PORT') or '3306',
-        'OPTIONS': {'charset': 'utf8mb4'},
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            **({'ssl': {'ca': str(BASE_DIR / os.environ['MYSQL_SSL_CA'])}}
+               if os.environ.get('MYSQL_SSL_CA') else {}),
+        },
     }
 }
 

@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: grombricks
+    runtime: python
+    rootDir: GromBricks
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DJANGO_DEBUG
+        value: false
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: grombricks.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://grombricks.onrender.com
+      - key: MYSQL_DATABASE
+        value: defaultdb
+      - key: MYSQL_USER
+        value: avnadmin
+      - key: MYSQL_PASSWORD
+        sync: false
+      - key: MYSQL_HOST
+        value: mysql-2021efea-grombricks.j.aivencloud.com
+      - key: MYSQL_PORT
+        value: "24626"
+      - key: MYSQL_SSL_CA
+        value: ca.pem
