@@ -122,8 +122,11 @@ DATABASES = {
         'PORT': os.environ.get('MYSQL_PORT') or '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
-            **({'ssl': {'ca': str(BASE_DIR / os.environ['MYSQL_SSL_CA'])}}
-               if os.environ.get('MYSQL_SSL_CA') else {}),
+            **({'ssl': {'ca': (
+                '/etc/secrets/' + os.environ['MYSQL_SSL_CA']
+                if os.path.exists('/etc/secrets/' + os.environ['MYSQL_SSL_CA'])
+                else str(BASE_DIR / os.environ['MYSQL_SSL_CA'])
+            )}} if os.environ.get('MYSQL_SSL_CA') else {}),
         },
     }
 }
