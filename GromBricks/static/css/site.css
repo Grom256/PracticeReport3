@@ -122,8 +122,7 @@ button, input, select { font: inherit; }
 .site-header { position: relative; z-index: 10; border-bottom: 1px solid rgba(130, 175, 255, 0.22); background: rgba(16, 32, 64, 0.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 .header-inner { min-height: 88px; display: grid; grid-template-columns: auto 1fr auto; gap: 38px; align-items: center; }
 .brand { display: inline-flex; align-items: center; gap: 11px; width: max-content; }
-.brand-mark { display: block; width: 42px; height: 42px; object-fit: contain; filter: drop-shadow(0 0 6px rgba(230, 191, 85, .25)); transition: transform .3s ease, filter .3s ease; }
-.brand-mark-photo { border-radius: 7px; mix-blend-mode: screen; }
+.brand-mark { display: block; width: 42px; height: 42px; object-fit: contain; transition: transform .3s ease; }
 .brand-word { color: var(--text); font-family: var(--font-heading); font-size: 14px; font-weight: 700; letter-spacing: .14em; line-height: 1.1; }
 .brand-word span { display: block; margin-top: 5px; color: var(--gold); font-size: 10px; letter-spacing: .34em; }
 .main-navigation { display: flex; justify-content: center; align-items: center; gap: clamp(18px, 3vw, 42px); }
@@ -658,7 +657,7 @@ h1, h2, h3, p { margin-top: 0; }
 /* ===== Design merge (20.10.2026): прозорий header поверх hero, пошук, кошик-капсула, hover-анімації ===== */
 .site-header { z-index: 20; border-bottom: 1px solid rgba(207, 214, 224, .14); background: rgba(7, 12, 24, .92); backdrop-filter: blur(14px); }
 .header-inner { min-height: 92px; gap: 32px; }
-.brand:hover .brand-mark, .brand:focus-visible .brand-mark { transform: translateY(-2px) scale(1.06); filter: drop-shadow(0 0 12px rgba(230, 191, 85, .55)); }
+.brand:hover .brand-mark, .brand:focus-visible .brand-mark { transform: translateY(-2px) scale(1.06); }
 .main-navigation a { position: relative; padding: 8px 0; color: #cfd6e0; font-size: 13px; letter-spacing: .12em; }
 .main-navigation a::after { position: absolute; right: 100%; bottom: 1px; left: 0; height: 1px; background: linear-gradient(90deg, var(--gold), var(--gold-bright)); content: ''; transition: right .3s ease; }
 .main-navigation a:hover::after, .main-navigation a:focus-visible::after { right: 0; }

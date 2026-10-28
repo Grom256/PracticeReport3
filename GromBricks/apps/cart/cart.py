@@ -25,8 +25,6 @@ def positive_integer(value):
 
 
 class Cart:
-    """Session-backed cart; prices are read from the current product records."""
-
     session_key = 'cart'
 
     def __init__(self, request):

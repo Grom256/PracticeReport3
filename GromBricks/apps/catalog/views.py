@@ -296,11 +296,9 @@ def sync_telegram_chat_id(request):
 
 
 class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
-    """Only staff may access catalog management views."""
 
     def test_func(self):
         return self.request.user.is_staff
-
 
 class ProductManageListView(StaffRequiredMixin, ListView):
     model = Product
