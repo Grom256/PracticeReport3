@@ -125,7 +125,6 @@ class AutomaticDiscountTests(TestCase):
         self.client.force_login(self.user)
 
     def test_no_discount_under_or_equal_2500(self):
-        # 2 units = 2000 UAH <= 2500 -> 0%
         self.client.post(reverse('cart:add', args=[self.product1.pk]), {'quantity': 2})
         cart = Cart(self.client)
         self.assertEqual(cart.subtotal, Decimal('2000.00'))
@@ -134,7 +133,6 @@ class AutomaticDiscountTests(TestCase):
         self.assertEqual(cart.total, Decimal('2000.00'))
 
     def test_five_percent_discount_over_2500(self):
-        # 3 units = 3000 UAH > 2500 -> 5% discount (150 UAH), total = 2850 UAH
         self.client.post(reverse('cart:add', args=[self.product1.pk]), {'quantity': 3})
         cart = Cart(self.client)
         self.assertEqual(cart.subtotal, Decimal('3000.00'))
@@ -143,7 +141,6 @@ class AutomaticDiscountTests(TestCase):
         self.assertEqual(cart.total, Decimal('2850.00'))
 
     def test_ten_percent_discount_over_5000(self):
-        # 6 units = 6000 UAH > 5000 -> 10% discount (600 UAH), total = 5400 UAH
         self.client.post(reverse('cart:add', args=[self.product1.pk]), {'quantity': 6})
         cart = Cart(self.client)
         self.assertEqual(cart.subtotal, Decimal('6000.00'))

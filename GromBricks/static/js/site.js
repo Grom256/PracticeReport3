@@ -1,4 +1,3 @@
-/* Мобільне меню — плавна анімація через max-height */
 document.addEventListener('DOMContentLoaded', () => {
     const toggle = document.querySelector('.menu-toggle');
     const navigation = document.querySelector('#main-navigation');
@@ -22,12 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
         isExpanded ? closeMenu() : openMenu();
     });
 
-    /* Закрити при кліку на посилання */
     navigation.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', closeMenu);
     });
 
-    /* Закрити при кліку поза меню */
     document.addEventListener('click', (e) => {
         if (
             navigation.classList.contains('is-open') &&
@@ -38,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    /* Закрити при Escape */
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && navigation.classList.contains('is-open')) {
             closeMenu();
@@ -47,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* Пошук */
 document.addEventListener('DOMContentLoaded', () => {
     const search = document.querySelector('.header-search');
     if (!search) return;
@@ -76,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* Full Card Click Navigation */
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.js-product-card').forEach(card => {
         card.addEventListener('click', (e) => {
@@ -87,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* AJAX Wishlist Toggle */
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.js-wishlist-form').forEach(form => {
         form.addEventListener('submit', async (e) => {
@@ -135,7 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* AJAX Add to Cart from Catalog Cards */
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.js-card-cart-form').forEach(form => {
         form.addEventListener('submit', async (e) => {
@@ -181,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-/* ─── Avatar file picker preview ─── */
 document.addEventListener('DOMContentLoaded', function () {
     const fileInput = document.getElementById('id_avatar');
     if (!fileInput) return;

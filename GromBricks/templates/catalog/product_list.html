@@ -9,7 +9,6 @@
     </div>
 
     <div class="catalog-layout">
-        <!-- Sidebar with Filters -->
         <aside class="catalog-sidebar">
             <form class="filter-panel" id="catalogFilterForm" method="get" action="{% url 'catalog:product_list' %}">
                 <div class="filter-panel-header">
@@ -19,7 +18,6 @@
                     {% endif %}
                 </div>
 
-                <!-- Search -->
                 <div class="filter-group">
                     <label class="filter-label" for="catalog-search">Пошук</label>
                     <div class="search-input-wrap">
@@ -27,7 +25,6 @@
                     </div>
                 </div>
 
-                <!-- Product Type -->
                 <div class="filter-group">
                     <label class="filter-label" for="catalog-type">Тип товару</label>
                     <select id="catalog-type" name="type">
@@ -38,7 +35,6 @@
                     </select>
                 </div>
 
-                <!-- Category -->
                 <div class="filter-group">
                     <label class="filter-label" for="catalog-category">Серія / Тематика</label>
                     <select id="catalog-category" name="category">
@@ -49,7 +45,6 @@
                     </select>
                 </div>
 
-                <!-- Flags -->
                 <div class="filter-group filter-group-checkboxes">
                     <span class="filter-label">Параметри</span>
                     <label class="check-filter">
@@ -62,7 +57,6 @@
                     </label>
                 </div>
 
-                <!-- Buttons -->
                 <div class="filter-actions">
                     <button class="button button-gold filter-submit-btn" type="submit">Застосувати</button>
                     {% if query or selected_type or selected_category or in_stock or rare_only %}
@@ -72,7 +66,6 @@
             </form>
         </aside>
 
-        <!-- Main Content: Topbar + Grid + Pagination -->
         <div class="catalog-content">
             <div class="catalog-topbar">
                 <div class="catalog-count">

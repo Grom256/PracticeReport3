@@ -39,6 +39,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Keep seeded records when rolling back, so existing catalog data is never deleted.
         migrations.RunPython(add_zane_golden_weapons, migrations.RunPython.noop),
     ]

@@ -35,7 +35,6 @@ class OrderFlowTests(TestCase):
             'address': 'Відділення №1',
             'postal_code': '',
             'delivery_service': 'nova_poshta',
-            # A client-supplied payment choice must not replace the server choice.
             'payment_method': 'bank_transfer',
         }
 
@@ -101,7 +100,6 @@ class OrderFlowTests(TestCase):
         )
         self.client.post(reverse('cart:remove', args=[self.product.pk]))
         self.client.post(reverse('cart:add', args=[expensive_product.pk]), {'quantity': 2})
-        # 2 * 3000 = 6000 UAH > 5000 -> 10% discount (600 UAH), total = 5400 UAH
 
         response = self.client.post(reverse('orders:checkout'), self.checkout_data)
         order = Order.objects.get(user=self.user)

@@ -159,21 +159,17 @@ class WishlistTests(TestCase):
         self.client.force_login(self.user)
 
     def test_wishlist_toggle_adds_and_removes_both_instock_and_out_of_stock(self):
-        # Toggle in-stock product
         res1 = self.client.post(reverse('catalog:wishlist_toggle', args=[self.product_in_stock.pk]))
         self.assertTrue(WishlistItem.objects.filter(user=self.user, product=self.product_in_stock).exists())
 
-        # Toggle out-of-stock product
         res2 = self.client.post(reverse('catalog:wishlist_toggle', args=[self.product_out_of_stock.pk]))
         self.assertTrue(WishlistItem.objects.filter(user=self.user, product=self.product_out_of_stock).exists())
 
-        # Both exist in wishlist view
         wishlist_res = self.client.get(reverse('catalog:wishlist'))
         self.assertEqual(wishlist_res.status_code, 200)
         self.assertContains(wishlist_res, 'Lloyd Golden')
         self.assertContains(wishlist_res, 'Sensei Wu Rare')
 
-        # Toggle in-stock product again -> removes it
         res3 = self.client.post(reverse('catalog:wishlist_toggle', args=[self.product_in_stock.pk]))
         self.assertFalse(WishlistItem.objects.filter(user=self.user, product=self.product_in_stock).exists())
         self.assertEqual(WishlistItem.objects.filter(user=self.user).count(), 1)
@@ -200,7 +196,6 @@ class StockNotificationTests(TestCase):
         mock_tg.return_value = True
         mock_email.return_value = 1
 
-        # Subscribe via both channels
         response = self.client.post(
             reverse('catalog:stock_notify', args=[self.product.pk]),
             {
@@ -215,7 +210,6 @@ class StockNotificationTests(TestCase):
         self.assertEqual(sub.channel, StockNotification.Channel.BOTH)
         self.assertFalse(sub.is_notified)
 
-        # Restock product (stock 0 -> 2)
         self.product.stock_quantity = 2
         self.product.save()
 

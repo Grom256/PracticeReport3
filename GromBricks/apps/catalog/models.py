@@ -96,7 +96,6 @@ class Product(models.Model):
         new_stock = self.stock_quantity
         self._previous_stock = new_stock
 
-        # If stock became available (>0) from 0 or on newly created product with stock
         if (old_stock == 0 and new_stock > 0) or (is_new and new_stock > 0):
             try:
                 from .services import process_stock_notifications

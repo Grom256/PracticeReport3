@@ -51,7 +51,6 @@ def sync_telegram_chat_id_from_updates(user) -> str:
             if not res_data.get('ok'):
                 return ''
             updates = res_data.get('result', [])
-            # Only the deep-link payload generated for this user may link a chat.
             expected_start_command = f'/start user_{user.pk}'
             for update in reversed(updates):
                 msg = update.get('message', {})
@@ -62,11 +61,10 @@ def sync_telegram_chat_id_from_updates(user) -> str:
                 if not chat_id:
                     continue
 
-                if text == expected_start_command:
+                if text == expected_start_command or text.startswith(f'{expected_start_command}_'):
                     profile = user.profile
                     profile.telegram_chat_id = chat_id
                     profile.save(update_fields=['telegram_chat_id'])
-                    # Send friendly confirmation to Telegram
                     send_telegram_message(
                         chat_id,
                         f'👋 <b>Вітаємо у GromBricks!</b>\n\n'
@@ -117,14 +115,12 @@ def process_stock_notifications(product) -> int:
 
     for item in notifications:
         sent = False
-        # Email channel
         if item.channel in ('email', 'both'):
             target_email = item.email or (item.user.email if item.user else '')
             if target_email:
                 if send_stock_email(target_email, product):
                     sent = True
 
-        # Telegram channel
         if item.channel in ('telegram', 'both'):
             target_chat_id = item.telegram_chat_id or (
                 item.user.profile.telegram_chat_id if item.user and hasattr(item.user, 'profile') else ''

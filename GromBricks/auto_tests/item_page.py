@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import pytest_check as check
+import time
 
 driver = webdriver.Firefox()
 driver.get("http://127.0.0.1:8000/catalog/")
@@ -15,6 +16,7 @@ href = product_link.get_attribute("href")
 print(href)
 
 assert "products" in href
+time.sleep(2)
 product_link.click()
 heading = driver.find_element(By.XPATH, "//h1")
 print(heading.text)

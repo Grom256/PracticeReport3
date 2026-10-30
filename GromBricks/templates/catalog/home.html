@@ -73,7 +73,6 @@ const switcherBtns = document.querySelectorAll('.viewer3d-btn');
 
 if (!canvas) throw new Error('canvas not found');
 
-// --- Models Dictionary ---
 const modelsData = {
     cole_jungle: {
         name: 'Cole Jungle',
@@ -100,20 +99,16 @@ const loadedModelsCache = new Map();
 let currentObject = null;
 let currentKey = null;
 
-// --- Renderer ---
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-// --- Scene ---
 const scene = new THREE.Scene();
 
-// --- Camera ---
 const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
 camera.position.set(0, 0.6, 6.2);
 
-// --- Lights ---
 const ambient = new THREE.AmbientLight(0xffffff, 1.4);
 scene.add(ambient);
 
@@ -135,7 +130,6 @@ const bottomLight = new THREE.DirectionalLight(0x314668, 0.8);
 bottomLight.position.set(0, -3, 2);
 scene.add(bottomLight);
 
-// --- Shadow plane ---
 const shadowPlane = new THREE.Mesh(
     new THREE.CircleGeometry(1.6, 48),
     new THREE.MeshStandardMaterial({
@@ -150,7 +144,6 @@ shadowPlane.position.y = -1.8;
 shadowPlane.receiveShadow = true;
 scene.add(shadowPlane);
 
-// --- OrbitControls ---
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.06;
@@ -171,7 +164,6 @@ renderer.domElement.addEventListener('pointerup', () => {
     idleTimer = setTimeout(() => { controls.autoRotate = true; }, 3000);
 });
 
-// --- Model Loader Function ---
 function showLoading(text) {
     if (loadingEl) {
         loadingEl.textContent = text;
@@ -198,24 +190,20 @@ function switchModel(key) {
 
     currentKey = key;
 
-    // Update UI text
     if (nameEl) nameEl.textContent = config.name;
     if (descEl) descEl.textContent = config.desc;
 
-    // Update buttons
     switcherBtns.forEach((btn) => {
         const active = btn.getAttribute('data-model') === key;
         btn.classList.toggle('is-active', active);
         btn.setAttribute('aria-selected', String(active));
     });
 
-    // Check if model already cached
     if (loadedModelsCache.has(key)) {
         if (currentObject) scene.remove(currentObject);
         currentObject = loadedModelsCache.get(key);
         scene.add(currentObject);
 
-        // Adjust shadow plane position
         const finalBox = new THREE.Box3().setFromObject(currentObject);
         shadowPlane.position.y = finalBox.min.y - 0.02;
 
@@ -223,7 +211,6 @@ function switchModel(key) {
         return;
     }
 
-    // Load from server
     showLoading(`Завантаження ${config.name}...`);
 
     const mtlLoader = new MTLLoader();
@@ -248,21 +235,17 @@ function switchModel(key) {
             objLoader.load(
                 config.obj,
                 (object) => {
-                    // Check if user switched to another model while loading
                     if (currentKey !== key) {
                         loadedModelsCache.set(key, object);
                         return;
                     }
 
-                    // Auto-center and normalize size
                     const bbox = new THREE.Box3().setFromObject(object);
                     const size = bbox.getSize(new THREE.Vector3());
                     const center = bbox.getCenter(new THREE.Vector3());
 
-                    // Center at (0, 0, 0)
                     object.position.sub(center);
 
-                    // Scale to fit viewport (~3.6 units tall)
                     const maxDim = Math.max(size.x, size.y, size.z);
                     if (maxDim > 0) {
                         const targetSize = 3.6;
@@ -322,7 +305,6 @@ function switchModel(key) {
     );
 }
 
-// Bind switcher buttons
 switcherBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
         const modelKey = btn.getAttribute('data-model');
@@ -330,10 +312,8 @@ switcherBtns.forEach((btn) => {
     });
 });
 
-// Initial load (Cole Jungle)
 switchModel('cole_jungle');
 
-// --- Resize ---
 function resize() {
     const stage = canvas.parentElement;
     const w = stage.clientWidth;
@@ -346,7 +326,6 @@ function resize() {
 resize();
 new ResizeObserver(resize).observe(canvas.parentElement);
 
-// --- Animate ---
 (function animate() {
     requestAnimationFrame(animate);
     controls.update();

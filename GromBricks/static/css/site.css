@@ -1,4 +1,3 @@
-/* ===== Local Fonts: Unbounded (Headings) & Manrope (Body) ===== */
 @font-face {
     font-family: 'Unbounded';
     src: url('../fonts/Unbounded/Unbounded-VariableFont_wght.ttf') format('truetype-variations'),
@@ -535,7 +534,6 @@ h1, h2, h3, p { margin-top: 0; }
     .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .catalog-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .search-field { grid-column: 1 / -1; }
-    /* detail-image uses aspect-ratio now */
 }
 
 @media (max-width: 700px) {
@@ -654,7 +652,6 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 
-/* ===== Design merge (20.10.2026): прозорий header поверх hero, пошук, кошик-капсула, hover-анімації ===== */
 .site-header { z-index: 20; border-bottom: 1px solid rgba(207, 214, 224, .14); background: rgba(7, 12, 24, .92); backdrop-filter: blur(14px); }
 .header-inner { min-height: 92px; gap: 32px; }
 .brand:hover .brand-mark, .brand:focus-visible .brand-mark { transform: translateY(-2px) scale(1.06); }
@@ -725,7 +722,6 @@ h1, h2, h3, p { margin-top: 0; }
     .info-row .telegram-panel, .info-row .delivery-panel { min-height: 0; padding: 27px 22px; }
 }
 
-/* Hero and compact mobile header refinements. */
 .page-home .site-header { border-bottom: 0; }
 .hero-section { min-height: 100vh; min-height: 100svh; }
 .hero-layout { flex: 1; min-height: 0; }
@@ -774,7 +770,6 @@ h1, h2, h3, p { margin-top: 0; }
     .hero-actions .button { padding-inline: 10px; font-size: 10px; }
 }
 
-/* Refinements requested after the first visual pass. */
 .nav-account { display: flex; align-items: center; gap: 16px; margin-left: 8px; padding-left: 20px; border-left: 1px solid rgba(207, 214, 224, .2); }
 .nav-account .header-account, .nav-account .header-logout button { padding: 6px 0; color: #aeb9ca; font-size: 11px; letter-spacing: .04em; }
 .nav-account .header-account:hover, .nav-account .header-logout button:hover { color: var(--gold-bright); }
@@ -800,7 +795,6 @@ h1, h2, h3, p { margin-top: 0; }
     .menu-toggle, .search-toggle, .header-cart { width: 36px; height: 36px; }
 }
 
-/* ===== Auth Pages (Centered, Electric Gradient & Edge Lightning) ===== */
 .page-auth .form-page {
     position: relative;
     isolation: isolate;
@@ -856,7 +850,6 @@ h1, h2, h3, p { margin-top: 0; }
     font-weight: 600;
 }
 
-/* Lightning bolts along screen edges */
 .auth-lightning {
     position: absolute;
     top: 50%;
@@ -968,7 +961,6 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 
-/* ===== 3D Viewer Section (Three.js) ===== */
 .viewer3d-section {
     position: relative;
     overflow: hidden;
@@ -1095,7 +1087,6 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 
-/* ===== Arrow Icons & Link Fixes ===== */
 .icon-arrow {
     display: inline-block;
     width: 14px;
@@ -1154,7 +1145,6 @@ h1, h2, h3, p { margin-top: 0; }
     height: 14px;
 }
 
-/* ===== Benefits Section (Grid Layout) ===== */
 .benefits-section {
     position: relative;
     overflow: hidden;
@@ -1246,7 +1236,6 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 
-/* ===== Catalog Sidebar Layout ===== */
 .catalog-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -1360,7 +1349,6 @@ h1, h2, h3, p { margin-top: 0; }
     font-size: 13px;
 }
 
-/* Catalog Content area */
 .catalog-content {
     min-width: 0;
 }
@@ -1436,7 +1424,6 @@ h1, h2, h3, p { margin-top: 0; }
     }
 }
 
-/* ===== Product Detail Enhancements ===== */
 .detail-guarantees {
     display: flex;
     flex-direction: column;
@@ -1492,7 +1479,6 @@ h1, h2, h3, p { margin-top: 0; }
     border-top: 1px solid rgba(154, 167, 191, .12);
 }
 
-/* ===== Profile Dashboard (Two-Column) ===== */
 .profile-page {
     padding-block: 54px 96px;
 }
@@ -1723,7 +1709,6 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 
-/* ===== New Features: Wishlist, Stock Notifications, Tiered Discounts ===== */
 .header-wishlist {
     display: inline-flex;
     align-items: center;
@@ -1923,7 +1908,6 @@ h1, h2, h3, p { margin-top: 0; }
     height: 17px;
 }
 
-/* Stock Notification Panel */
 .stock-notify-panel {
     background: linear-gradient(135deg, rgba(23, 47, 92, .85), rgba(13, 26, 54, .95));
     border: 1px solid rgba(230, 191, 85, .4);
@@ -2043,7 +2027,6 @@ h1, h2, h3, p { margin-top: 0; }
     font-size: 14px;
 }
 
-/* Discount Promo Banner in Cart */
 .cart-discount-banner {
     display: flex;
     align-items: center;
@@ -2151,7 +2134,6 @@ h1, h2, h3, p { margin-top: 0; }
     color: #4ade80;
 }
 
-/* Wishlist Grid & Cards */
 .wishlist-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -2271,7 +2253,6 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 
-/* ===== Modernized Product Card with Full Clickability & Action Bar ===== */
 .product-card {
     position: relative;
     min-width: 0;
@@ -2533,7 +2514,6 @@ h1, h2, h3, p { margin-top: 0; }
     height: 17px;
 }
 
-/* ===== Mobile Search Override ===== */
 @media (max-width: 700px) {
     .header-search { position: static; }
     .header-search input {
@@ -2564,7 +2544,6 @@ h1, h2, h3, p { margin-top: 0; }
     }
     .search-toggle { position: relative; z-index: 201; }
 }
-/* ===== Mobile Wishlist Header Button ===== */
 @media (max-width: 700px) {
     .header-wishlist {
         width: 40px;
@@ -2589,26 +2568,21 @@ h1, h2, h3, p { margin-top: 0; }
 @media (max-width: 380px) {
     .header-wishlist { width: 36px; height: 36px; }
 }
-/* ===== Mobile Product Card Optimizations ===== */
 @media (max-width: 600px) {
-    /* Зображення займає більше місця — збільшуємо співвідношення */
     .product-card-media {
         aspect-ratio: 1 / 1.1;
     }
 
-    /* Менший внутрішній відступ тіла картки */
     .product-card-body {
         padding: 10px 12px 12px;
     }
 
-    /* Менша мета-інформація */
     .product-meta {
         font-size: 9px;
         margin-bottom: 4px;
         gap: 4px;
     }
 
-    /* Менший заголовок, без мінімальної висоти */
     .product-title {
         font-size: 12px;
         min-height: 0;
@@ -2616,7 +2590,6 @@ h1, h2, h3, p { margin-top: 0; }
         -webkit-line-clamp: 2;
     }
 
-    /* Менша ціна */
     .product-price {
         font-size: 14px;
     }
@@ -2624,18 +2597,15 @@ h1, h2, h3, p { margin-top: 0; }
         font-size: 10px;
     }
 
-    /* Менша пілюля стану */
     .product-condition-pill {
         font-size: 9px;
         padding: 2px 5px;
     }
 
-    /* Менший рядок ціни */
     .product-price-row {
         margin-bottom: 8px;
     }
 
-    /* Тонші кнопки дій */
     .product-card-actions {
         padding-top: 8px;
         gap: 6px;
@@ -2660,7 +2630,6 @@ h1, h2, h3, p { margin-top: 0; }
         height: 14px;
     }
 
-    /* Менші бейджі на зображенні */
     .stock-badge {
         font-size: 9px;
         padding: 2px 7px;
@@ -2683,7 +2652,6 @@ h1, h2, h3, p { margin-top: 0; }
     .card-btn-cart, .card-btn-notify { font-size: 10px; height: 30px; }
 }
 
-/* ===== Modern Cart Redesign ===== */
 .cart-items-table {
     margin-bottom: 28px;
 }
@@ -2900,7 +2868,6 @@ h1, h2, h3, p { margin-top: 0; }
     .cell-label { display: inline-block; }
 }
 
-/* ===== Catalog Management Styles ===== */
 .manage-intro-actions {
     display: flex;
     flex-wrap: wrap;
@@ -3057,7 +3024,6 @@ h1, h2, h3, p { margin-top: 0; }
 }
 
 
-/* ─── Avatar file picker ─── */
 .profile-form .form-field input[type="file"] {
     width: 100%;
     min-height: auto;

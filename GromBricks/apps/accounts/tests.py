@@ -10,7 +10,6 @@ User = get_user_model()
 
 class AccountFlowTests(TestCase):
     def test_registration_flow_with_email_code_verification(self):
-        # 1. Подання форми реєстрації
         response = self.client.post(
             reverse('accounts:register'),
             {
@@ -24,18 +23,15 @@ class AccountFlowTests(TestCase):
         )
         self.assertRedirects(response, reverse('accounts:verify_email'))
 
-        # Перевірка, що користувач створений, але неактивний до підтвердження
         user = User.objects.get(username='brickfan')
         self.assertFalse(user.is_active)
         self.assertFalse(user.profile.is_email_verified)
         self.assertTrue(len(user.profile.verification_code) == 6)
 
-        # Перевірка відправлення листа через Django mail
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn(user.profile.verification_code, mail.outbox[0].body)
         self.assertEqual(mail.outbox[0].to, ['olena@example.com'])
 
-        # 2. Спроба ввести невірний код
         verify_fail = self.client.post(
             reverse('accounts:verify_email'),
             {'code': '000000'},
@@ -45,7 +41,6 @@ class AccountFlowTests(TestCase):
         user.refresh_from_db()
         self.assertFalse(user.is_active)
 
-        # 3. Введення правильного коду
         correct_code = user.profile.verification_code
         verify_success = self.client.post(
             reverse('accounts:verify_email'),
@@ -53,7 +48,6 @@ class AccountFlowTests(TestCase):
         )
         self.assertRedirects(verify_success, reverse('accounts:profile'))
 
-        # Користувач активований і залогінений
         user.refresh_from_db()
         self.assertTrue(user.is_active)
         self.assertTrue(user.profile.is_email_verified)
@@ -75,7 +69,6 @@ class AccountFlowTests(TestCase):
         user = User.objects.get(username='brickfan2')
         first_code = user.profile.verification_code
 
-        # Запит нового коду
         resend_response = self.client.post(reverse('accounts:resend_code'))
         self.assertRedirects(resend_response, reverse('accounts:verify_email'))
 

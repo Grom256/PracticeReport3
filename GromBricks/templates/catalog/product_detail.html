@@ -74,7 +74,6 @@
                     {% endif %}
                 {% endif %}
 
-                <!-- Wishlist Toggle Button (works for both in-stock and out-of-stock items) -->
                 <div class="detail-wishlist-action">
                     {% if user.is_authenticated %}
                         <form class="js-wishlist-form" method="post" action="{% url 'catalog:wishlist_toggle' product.pk %}">
@@ -94,7 +93,6 @@
                 </div>
             </div>
 
-            <!-- Out-of-stock Notification Card -->
             {% if product.stock_quantity == 0 %}
                 <div class="stock-notify-panel">
                     <div class="stock-notify-header">
@@ -149,7 +147,7 @@
                             </div>
                             <div class="telegram-bot-hint">
                                 <span>Бот сповіщень: </span>
-                                <a href="https://t.me/{{ bot_username }}?start=notify_{{ product.pk }}" target="_blank" rel="noopener noreferrer" class="bot-link">
+                                <a href="https://t.me/{{ bot_username }}?start={% if user.is_authenticated %}user_{{ user.pk }}_notify_{{ product.pk }}{% else %}notify_{{ product.pk }}{% endif %}" target="_blank" rel="noopener noreferrer" class="bot-link">
                                     @{{ bot_username }} {% include 'partials/icon_arrow.html' %}
                                 </a>
                                 <p class="small-text">Натисніть на посилання бота, натисніть <b>«Start»</b> у Telegram, потім натисніть <i>«Визначити Chat ID»</i> або вкажіть ваш ID.</p>

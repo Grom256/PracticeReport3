@@ -250,13 +250,11 @@ def stock_notification_subscribe(request, product_id):
         sub.is_notified = False
         sub.save(update_fields=['channel', 'is_notified'])
 
-    # If user provided telegram_chat_id and profile exists without one, remember it
     if request.user.is_authenticated and hasattr(request.user, 'profile') and telegram_chat_id:
         if not request.user.profile.telegram_chat_id:
             request.user.profile.telegram_chat_id = telegram_chat_id
             request.user.profile.save(update_fields=['telegram_chat_id'])
 
-    # Send a confirmation ping to Telegram if Telegram was chosen
     if channel in (StockNotification.Channel.TELEGRAM, StockNotification.Channel.BOTH) and telegram_chat_id:
         send_telegram_message(
             telegram_chat_id,

@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
-# Build script for Render deployment
 set -o errexit
 
 pip install -r requirements.txt
 python manage.py collectstatic --no-input
 python manage.py migrate
 
-# Create admin user if not exists
 python -c "
 import os, django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
